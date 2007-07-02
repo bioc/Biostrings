@@ -17,8 +17,7 @@ exportMethods(
     alphabet, subBString, substr, substring,
     subject, first, last, width, desc, BStringViews, writeFASTA,
     reverse, complement, reverseComplement, alphabetFrequency,
-    matchPattern, countPattern, mismatch,
-    matchProbePair,
+    matchPattern, countPattern, mismatch, matchProbePair, mask,
     ## Copy/pasted from Biostrings 1
     needwunsQS
 )
