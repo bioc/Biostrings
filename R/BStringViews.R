@@ -45,7 +45,7 @@ setMethod("last", "BStringViews", function(x) {.Deprecated("end"); end(x)})
 ### necesarily equal to the number of letters that it contains (this happens
 ### when the view is out of limits).
 setGeneric("width", function(x) standardGeneric("width"))
-setMethod("width", "BStringViews", function(x) end(x) - start(x) + 1)
+setMethod("width", "BStringViews", function(x) end(x) - start(x) + 1L)
 
 setGeneric("desc", function(x) standardGeneric("desc"))
 setMethod("desc", "BStringViews", function(x) x@views$desc)
@@ -406,9 +406,13 @@ setMethod("toString", "BStringViews",
 setMethod("nchar", "BStringViews",
     function(x, type)
     {
-        ls <- length(x@subject)
-        (ifelse(x@views$end<=ls, x@views$end, ls) -
-         ifelse(x@views$start>=1, x@views$start, 1) + 1)
+        if (length(x) == 0)
+            return(integer(0))
+        start0 <- pmax.int(start(x), 1L)
+        end0 <- pmin.int(end(x), nchar(x@subject))
+        ans <- end0 - start0 + 1L
+        ans[ans < 0L] <- 0L
+        ans
     }
 )
 
