@@ -101,14 +101,15 @@ Here is some provisional code for computing
 a consensus matrix for a group of equal-length strings
 assumed to be aligned.
 <<conscod>>=
-consmat <- function(Lmers, freq=FALSE) {
- lens <- nchar(Lmers)
- if (!all(lens==lens[1])) stop("must have equal number of bases in each element")
- str <- as.character(Lmers)
- N <- length(Lmers)
- pure <- unlist(lapply(str, function(x) strsplit(x,"")[[1]]))
- pos <- as.numeric(t(col(matrix(0, nr=N,nc=lens[1])) ))
- table(codes=pure,pos=pos)/ifelse(freq,N,1)
+consmat <- function(Lmers, freq=FALSE)
+{
+  lens <- nchar(Lmers)
+  if (!all(lens == lens[1])) stop("must have equal number of bases in each element")
+  str <- as.character(Lmers)
+  N <- length(Lmers)
+  pure <- unlist(strsplit(str, NULL))
+  pos <- rep.int(seq_len(lens[1]), N)
+  table(codes=pure, pos=pos) / ifelse(freq, N, 1)
 }
 @
 To illustrate, the following application assumes the ORF data

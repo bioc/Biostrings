@@ -3,9 +3,10 @@
 \alias{read.BStringViews}
 \alias{write.BStringViews}
 
+\alias{FASTArecordsToCharacter}
+\alias{CharacterToFASTArecords}
 \alias{FASTArecordsToBStringViews}
 \alias{BStringViewsToFASTArecords}
-
 
 \title{Input/output of BStringViews objects}
 
@@ -18,6 +19,8 @@
   read.BStringViews(file, format, subjectClass, collapse="")
   write.BStringViews(x, file="", format, width=80)
 
+  FASTArecordsToCharacter(FASTArecs, use.names=TRUE)
+  CharacterToFASTArecords(x)
   FASTArecordsToBStringViews(FASTArecs, subjectClass, collapse="")
   BStringViewsToFASTArecords(x)
 }
@@ -53,6 +56,10 @@
   \item{FASTArecs}{
     A list as one returned by \code{\link{readFASTA}}.
   }
+  \item{use.names}{
+    Should the \code{desc} component of the FASTA records be used to name the
+    returned character vector?
+  }
 }
 
 \details{
@@ -66,8 +73,8 @@
 
   \code{FASTArecordsToBStringViews} and \code{BStringViewsToFASTArecords}
   are lower-level functions that are used by \code{read.BStringViews}
-  and \code{write.BStringViews} for the conversion between a "FASTA
-  records object" (a list as one returned by \code{\link{readFASTA}})
+  and \code{write.BStringViews} for the conversion between a list of
+  FASTA records (as one returned by \code{\link{readFASTA}})
   and a \link{BStringViews} object.
 }
 

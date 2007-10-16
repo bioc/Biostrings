@@ -165,7 +165,7 @@
       Equivalent to \code{!(e1 == e2)}.
     }
     \item{}{
-      \code{as.character(x)}:
+      \code{as.character(x, use.names)}:
       Converts \code{x} to a character vector of same length as \code{x}.
     }
     \item{}{
