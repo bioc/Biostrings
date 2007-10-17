@@ -1,6 +1,7 @@
 \name{align-utils}
 
 \alias{consmat}
+\alias{consmat,matrix-method}
 \alias{consmat,character-method}
 \alias{consmat,list-method}
 \alias{consmat,BStringViews-method}
