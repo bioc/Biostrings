@@ -29,6 +29,10 @@
   }
 }
 
+\seealso{
+  \link{BStringViews-class}
+}
+
 \examples{
   file <- system.file("Exfiles", "someORF.fsa", package="Biostrings")
   orf <- read.BStringViews(file, "fasta", "DNAString")
@@ -37,6 +41,10 @@
   ## to be aligned for the first 10 positions (patently false):
   orf10 <- subviews(orf, 1, 10)
   consmat(orf10)
+
+  ## For the character matrix containing the "exploded" representation
+  ## of the views, do:
+  as.matrix(orf10, mode="character")
 }
 
 \keyword{methods}
