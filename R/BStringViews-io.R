@@ -80,6 +80,44 @@ BStringViewsToFASTArecords <- function(x)
     FASTArecordsToBStringViews(FASTArecs, subjectClass, collapse)
 }
 
+### WORK IN PROGRESS!
+###
+### Attempt to implement a _fast_ version of the above .read.fasta() by:
+###   - shortcutting the use of readFASTA()
+###   - use readLines to read the FASTA file line by line
+###   - call XRaw.write() on each line + XRaw() and XRaw.copy() when it's
+###     time to reallocate a biggest XRaw object.
+###
+### 'file' must be a character string or connection.
+### If 'file' is a connection, then 'type' is ignored.
+### If it's a character string then 'type' can be "default" (i.e. 'file' is a
+### path to the file to be opened or a complete URL, or '""' or '"stdin"' or
+### '"clipboard"'), "gzfile" (then 'file' should be path to a file that
+### is compressed by 'gzip'), "bzfile" (then 'file' should be path to a file
+### that is compressed by 'bzip2') or "unz" (not supported yet).
+.read.fasta2 <- function(file, subjectClass, collapse, type="default")
+{
+    if (is.character(file)) {
+        file <- switch(type,
+                    default = file(file, "r"),
+                    gzfile = gzfile(file, "r"),
+                    bzfile = bzfile(file, "r"),
+                    unz = stop("type \"unz\" not supported yet")
+                )
+        on.exit(close(file))
+    } else {
+        if (!inherits(file, "connection"))
+            stop("'file' must be a character string or connection")
+        if (!isOpen(file)) {
+            open(file, "r")
+            on.exit(close(file))
+        }
+    }
+    while (length(line <- readLines(file, n=1)) != 0) {
+        cat(line, "\n", sep="")
+    }
+}
+
 read.BStringViews <- function(file, format, subjectClass, collapse="")
 {
     if (missing(file))
