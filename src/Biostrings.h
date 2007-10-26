@@ -285,13 +285,13 @@ SEXP XRaw_read_complexes_from_subset(
 
 SEXP XRaw_loadFASTA(
 		SEXP xraw_xp,
-		SEXP file,
+		SEXP filepath,
 		SEXP collapse
 );
 
 SEXP XRaw_loadFASTA_and_encode(
 		SEXP xraw_xp,
-		SEXP file,
+		SEXP filepath,
 		SEXP collapse,
 		SEXP lkup
 );

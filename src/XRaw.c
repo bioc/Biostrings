@@ -636,13 +636,37 @@ SEXP XRaw_read_complexes_from_subset(SEXP src_xraw_xp, SEXP subset, SEXP lkup)
  *
  */
 
-SEXP XRaw_loadFASTA(SEXP xraw_xp, SEXP file, SEXP collapse)
+#define FASTALINE_MAX 20000
+
+SEXP XRaw_loadFASTA(SEXP xraw_xp, SEXP filepath, SEXP collapse)
 {
-	error("not available yet");
+	SEXP dest;
+	const char *path, *coll;
+	FILE *infile;
+	long int current_pos, last_pos;
+	char line[FASTALINE_MAX+1];
+
+	dest = R_ExternalPtrTag(xraw_xp);
+	path = CHAR(STRING_ELT(filepath, 0));
+	coll = CHAR(STRING_ELT(collapse, 0));
+
+	if ((infile = fopen(path, "r")) == NULL)
+		error("cannot open file");
+	current_pos = ftell(infile);
+	while (fgets(line, FASTALINE_MAX+1, infile) != NULL) {
+		last_pos = current_pos;
+		current_pos = ftell(infile);
+		if (current_pos - last_pos >= FASTALINE_MAX) {
+			fclose(infile);
+			error("file contains lines that are too long");
+		}
+	}
+	fclose(infile);
+	Rprintf("current pos = %ld\n", current_pos);
 	return R_NilValue;
 }
 
-SEXP XRaw_loadFASTA_and_encode(SEXP xraw_xp, SEXP file, SEXP collapse, SEXP lkup)
+SEXP XRaw_loadFASTA_and_encode(SEXP xraw_xp, SEXP filepath, SEXP collapse, SEXP lkup)
 {
 	error("not available yet");
 	return R_NilValue;
