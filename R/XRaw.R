@@ -274,6 +274,49 @@ XRaw.readComplexes <- function(x, i, imax=integer(0), lkup)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### XRaw IO
+###
+
+XRaw.saveFASTA <- function(x, file, dec_lkup=NULL)
+{
+    stop("not ready yet, sorry!")
+}
+
+### Returns a list of 3 elements:
+###   - The 'nchar0' element (single integer): contains the number of bytes
+###     that were written to x (should never be 0).
+###   - The 'nchar' element (integer vector): contains the lengths
+###     of the FASTA sequences (should never be 0).
+###   - The 'desc' element (character vector): contains the descriptions
+###     of the fasta sequences.
+### The 'nchar' and 'desc' vectors always have the same length (>= 1).
+### Note that 'nchar0' can be deduced from 'nchar' with:
+###   nchar0 <- sum(nchar) + nchar(collapse, type="bytes") * (length(nchar) - 1)
+XRaw.loadFASTA <- function(x, file, collapse, enc_lkup=NULL)
+{
+    if (is.character(file)) {
+        file <- file(file, "r")
+        on.exit(close(file))
+    } else {
+        if (!inherits(file, "connection"))
+            stop("'file' must be a character string or connection")
+        if (!isOpen(file)) {
+            open(file, "r")
+            on.exit(close(file))
+        }
+    }
+    if (!is.character(collapse) || length(collapse) != 1 || is.na(collapse))
+        stop("'collapse' must be a single string (can't be NA)")
+    if (is.null(enc_lkup))
+        .Call("XRaw_loadFASTA",
+              x@xp, file, collapse, PACKAGE="Biostrings")
+    else
+        .Call("XRaw_loadFASTA_and_encode",
+              x@xp, file, collapse, enc_lkup, PACKAGE="Biostrings")
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### length(as.integer(xr)) is equivalent to length(xr)
 ### but the latter is MUCH faster!
 setMethod("as.integer", "XRaw",

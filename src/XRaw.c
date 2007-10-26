@@ -219,6 +219,7 @@ SEXP Biostrings_XRaw_memcmp(SEXP xraw1_xp, SEXP start1,
 /****************************************************************************
  * READ/WRITE functions
  * ====================
+ *
  * The functions in this section implement the read/write operations to a
  * "XRaw" object. The user can choose between 2 interfaces for each
  * read or write operation:
@@ -563,16 +564,16 @@ SEXP XRaw_write_enc_chars_to_i1i2(SEXP dest_xraw_xp, SEXP imin, SEXP imax,
 		SEXP string, SEXP lkup)
 {
 	SEXP dest, src;
-	int i1, i2, n;
+	int i1, i2;
 
 	dest = R_ExternalPtrTag(dest_xraw_xp);
 	i1 = INTEGER(imin)[0] - 1;
 	i2 = INTEGER(imax)[0] - 1;
-	n = i2 - i1 + 1;
 	src = STRING_ELT(string, 0);
 	_Biostrings_translate_charcpy_to_i1i2(i1, i2,
-		(char *) RAW(dest), n, CHAR(src), LENGTH(src),
-		INTEGER(lkup), LENGTH(lkup));
+			(char *) RAW(dest), LENGTH(dest),
+			CHAR(src), LENGTH(src),
+			INTEGER(lkup), LENGTH(lkup));
 	return dest_xraw_xp;
 }
 
@@ -626,5 +627,24 @@ SEXP XRaw_read_complexes_from_subset(SEXP src_xraw_xp, SEXP subset, SEXP lkup)
 	error("not available yet");
 	UNPROTECT(1);
 	return dest;
+}
+
+
+/****************************************************************************
+ * I/O functions
+ * =============
+ *
+ */
+
+SEXP XRaw_loadFASTA(SEXP xraw_xp, SEXP file, SEXP collapse)
+{
+	error("not available yet");
+	return R_NilValue;
+}
+
+SEXP XRaw_loadFASTA_and_encode(SEXP xraw_xp, SEXP file, SEXP collapse, SEXP lkup)
+{
+	error("not available yet");
+	return R_NilValue;
 }
 
