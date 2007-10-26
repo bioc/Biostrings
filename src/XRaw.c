@@ -638,6 +638,21 @@ SEXP XRaw_read_complexes_from_subset(SEXP src_xraw_xp, SEXP subset, SEXP lkup)
 
 #define FASTALINE_MAX 20000
 
+/*
+ XRaw_loadFASTA() is designed to be fast:
+
+    filepath <- "/home/hpages/BSgenome_srcdata/UCSC/hg18/chr1.fa"
+    filesize <- file.info(filepath)$size
+    if (is.na(filesize))
+         stop(filepath, ": file not found")
+    filesize <- as.integer(filesize)
+    if (is.na(filesize))
+        stop(filepath, ": file is too big")
+    xraw <- Biostrings:::XRaw(filesize)
+    # Takes 0.524 second on lamb1!
+    system.time(.Call("XRaw_loadFASTA", xraw@xp, filepath, "", PACKAGE="Biostrings"))
+*/
+
 SEXP XRaw_loadFASTA(SEXP xraw_xp, SEXP filepath, SEXP collapse)
 {
 	SEXP dest;
