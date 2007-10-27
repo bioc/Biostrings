@@ -1,5 +1,6 @@
 #include "Biostrings.h"
 
+#include <ctype.h>
 
 static int debug = 0;
 
@@ -639,8 +640,36 @@ SEXP XRaw_read_complexes_from_subset(SEXP src_xraw_xp, SEXP subset, SEXP lkup)
 #define FASTALINE_MAX 20000
 
 /*
+ XRaw_loadFASTA().
+ Load a FASTA file into an XRaw object.
+
+ Return a named list of 4 elements:
+
+   - "nbyte" (single integer): number of bytes that were written to the XRaw
+     object. XRaw_loadFASTA() starts to write at position 1 (the first byte)
+     in the XRaw object. If nbyte_max is the length of the XRaw object, we
+     should always have 1 <= nbyte <= nbyte_max. An error is raised if the
+     FASTA file contains no data or if the size of the data exceeds the
+     capacity (i.e. the length) of the XRaw object i.e. if XRaw_loadFASTA()
+     tries to write more than nbyte_max bytes to the XRaw object (it does not
+     try to resize it). 
+
+   - "start" and "end": 2 integer vectors of same length L (L should always be
+     >= 1) containing the start/end positions of the FASTA sequences relatively
+     to the first byte of the XRaw object. The start/end positions define a set
+     of views such that:
+       (a) there is at least one view,
+       (b) all views have a width >= 1 ('all(start <= end)' is TRUE),
+       (c) the views are not overlapping and are sorted from left to right,
+       (d) the leftmost view starts at position 1 (start[1] == 1) and the
+           rightmost view ends at position nbyte (end[L] == nbyte).
+
+   - "desc" (character vector): descriptions of the FASTA sequences. The length
+     of 'desc' is L too.
+
  XRaw_loadFASTA() is designed to be fast:
 
+    library(Biostrings)
     filepath <- "/home/hpages/BSgenome_srcdata/UCSC/hg18/chr1.fa"
     filesize <- file.info(filepath)$size
     if (is.na(filesize))
@@ -649,41 +678,128 @@ SEXP XRaw_read_complexes_from_subset(SEXP src_xraw_xp, SEXP subset, SEXP lkup)
     if (is.na(filesize))
         stop(filepath, ": file is too big")
     xraw <- Biostrings:::XRaw(filesize)
-    # Takes 0.524 second on lamb1!
-    system.time(.Call("XRaw_loadFASTA", xraw@xp, filepath, "", PACKAGE="Biostrings"))
+    # Takes 0.5 second on lamb1!
+    .Call("XRaw_loadFASTA", xraw@xp, filepath, "", NULL, PACKAGE="Biostrings")
+    # or use safe wrapper:
+    Biostrings:::XRaw.loadFASTA(xraw, filepath)
 */
 
-SEXP XRaw_loadFASTA(SEXP xraw_xp, SEXP filepath, SEXP collapse)
+SEXP XRaw_loadFASTA(SEXP xraw_xp, SEXP filepath, SEXP collapse, SEXP lkup)
 {
-	SEXP dest;
+	SEXP ans, ans_names, ans_elt, dest;
 	const char *path, *coll;
 	FILE *infile;
-	long int current_pos, last_pos;
-	char line[FASTALINE_MAX+1];
+	long int lineno;
+	char line[FASTALINE_MAX+1], desc[FASTALINE_MAX+1];
+	int nbyte_max, gaplen, L, line_len, status, view_start, i1, i2, i;
+	char **views_descbuf, c0;
 
 	dest = R_ExternalPtrTag(xraw_xp);
+	nbyte_max = LENGTH(dest);
 	path = CHAR(STRING_ELT(filepath, 0));
 	coll = CHAR(STRING_ELT(collapse, 0));
+	gaplen = strlen(coll);
 
 	if ((infile = fopen(path, "r")) == NULL)
 		error("cannot open file");
-	current_pos = ftell(infile);
+	lineno = L = i1 = 0;
+	status = 0; /* 0: expecting desc; 1: expecting seq; 2: no expectation */
+	_Biostrings_reset_views_buffer();
+	/* TODO: Try to use fgets_rtrimmed() (defined in utils.c) instead of fgets() */
 	while (fgets(line, FASTALINE_MAX+1, infile) != NULL) {
-		last_pos = current_pos;
-		current_pos = ftell(infile);
-		if (current_pos - last_pos >= FASTALINE_MAX) {
+		lineno++;
+		line_len = strlen(line);
+		if (line_len >= FASTALINE_MAX) {
 			fclose(infile);
 			error("file contains lines that are too long");
 		}
+
+		/* When fgets() is replaced by fgets_rtrimmed(), remove the 4 lines below */
+		i = line_len - 1;
+		while (i >= 0 && isspace(line[i])) i--;
+		line_len = i + 1;
+		line[line_len] = 0;
+
+		if (line_len == 0)
+			continue;
+		c0 = line[0];
+		if (c0 == ';')
+			continue;
+		if (c0 != '>') {
+			if (status == 0) {
+				fclose(infile);
+				error("file does not seem to be FASTA");
+			}
+			i2 = i1 + line_len - 1;
+			_Biostrings_memcpy_to_i1i2(i1, i2,
+				(char *) RAW(dest), nbyte_max,
+				line, line_len, sizeof(char));
+/*
+			_Biostrings_translate_charcpy_to_i1i2(i1, i2,
+				(char *) RAW(dest), nbyte_max,
+				line, line_len,
+				INTEGER(lkup), LENGTH(lkup));
+*/
+			i1 = i2 + 1;
+			status = 2;
+			continue;
+		}
+		if (status == 1) {
+			fclose(infile);
+			error("file does not seem to be FASTA");
+		}
+		if (status == 2) {
+			L = _Biostrings_report_view(view_start, i1, desc);
+			if (gaplen != 0) {
+				i2 = i1 + gaplen - 1;
+				_Biostrings_memcpy_to_i1i2(i1, i2,
+					(char *) RAW(dest), nbyte_max,
+					coll, gaplen, sizeof(char));
+				i1 = i2 + 1;
+			}
+		}
+		view_start = i1 + 1;
+		strcpy(desc, line + 1);
+		status = 1;
 	}
 	fclose(infile);
-	Rprintf("current pos = %ld\n", current_pos);
-	return R_NilValue;
-}
+	if (status != 2)
+		error("file does not seem to be FASTA");
+	L = _Biostrings_report_view(view_start, i1, desc);
 
-SEXP XRaw_loadFASTA_and_encode(SEXP xraw_xp, SEXP filepath, SEXP collapse, SEXP lkup)
-{
-	error("not available yet");
-	return R_NilValue;
+	PROTECT(ans = NEW_LIST(4));
+	/* set the names */
+	PROTECT(ans_names = NEW_CHARACTER(4));
+	SET_STRING_ELT(ans_names, 0, mkChar("nbyte"));
+	SET_STRING_ELT(ans_names, 1, mkChar("start"));
+	SET_STRING_ELT(ans_names, 2, mkChar("end"));
+	SET_STRING_ELT(ans_names, 3, mkChar("desc"));
+	SET_NAMES(ans, ans_names);
+	UNPROTECT(1);
+	/* set the "nbyte" element */
+	PROTECT(ans_elt = NEW_INTEGER(1));
+	INTEGER(ans_elt)[0] = i1;
+	SET_ELEMENT(ans, 0, ans_elt);
+	UNPROTECT(1);
+	/* set the "start" element */
+	PROTECT(ans_elt = NEW_INTEGER(L));
+	memcpy(INTEGER(ans_elt), _Biostrings_get_views_start(), sizeof(int) * L);
+	SET_ELEMENT(ans, 1, ans_elt);
+	UNPROTECT(1);
+	/* set the "end" element */
+	PROTECT(ans_elt = NEW_INTEGER(L));
+	memcpy(INTEGER(ans_elt), _Biostrings_get_views_end(), sizeof(int) * L);
+	SET_ELEMENT(ans, 2, ans_elt);
+	UNPROTECT(1);
+	/* set the "desc" element */
+	PROTECT(ans_elt = NEW_CHARACTER(L));
+	views_descbuf = _Biostrings_get_views_desc();
+	for (i = 0; i < L; i++)
+		SET_STRING_ELT(ans_elt, i, mkChar(views_descbuf[i]));
+	SET_ELEMENT(ans, 3, ans_elt);
+	UNPROTECT(1);
+	/* ans is ready */
+	UNPROTECT(1);
+	return ans;
 }
 

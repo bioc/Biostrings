@@ -138,9 +138,14 @@ void _Biostrings_coerce_to_complex_from_i1i2(
 
 void _Biostrings_reset_views_buffer();
 
+int *_Biostrings_get_views_start();
+int *_Biostrings_get_views_end();
+char **_Biostrings_get_views_desc();
+
 int _Biostrings_report_view(
 		int start,
-		int end
+		int end,
+		const char *desc
 );
 
 int _Biostrings_report_match(
@@ -148,8 +153,11 @@ int _Biostrings_report_match(
 		int Rpos
 );
 
-int *_Biostrings_get_views_start();
-int *_Biostrings_get_views_end();
+char *fgets_rtrimmed(
+		char *s,
+		int size,
+		FILE *stream
+);
 
 
 /* XRaw.c */
@@ -284,12 +292,6 @@ SEXP XRaw_read_complexes_from_subset(
 );
 
 SEXP XRaw_loadFASTA(
-		SEXP xraw_xp,
-		SEXP filepath,
-		SEXP collapse
-);
-
-SEXP XRaw_loadFASTA_and_encode(
 		SEXP xraw_xp,
 		SEXP filepath,
 		SEXP collapse,
