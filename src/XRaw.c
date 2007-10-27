@@ -1,5 +1,4 @@
 #include "Biostrings.h"
-
 #include <ctype.h>
 
 static int debug = 0;
@@ -667,21 +666,30 @@ SEXP XRaw_read_complexes_from_subset(SEXP src_xraw_xp, SEXP subset, SEXP lkup)
    - "desc" (character vector): descriptions of the FASTA sequences. The length
      of 'desc' is L too.
 
- XRaw_loadFASTA() is designed to be fast:
+ XRaw_loadFASTA() is designed to be very fast:
 
-    library(Biostrings)
-    filepath <- "/home/hpages/BSgenome_srcdata/UCSC/hg18/chr1.fa"
-    filesize <- file.info(filepath)$size
-    if (is.na(filesize))
+     library(Biostrings)
+     filepath <- "/home/hpages/BSgenome_srcdata/UCSC/hg18/chr1.fa"
+     filesize <- file.info(filepath)$size
+     if (is.na(filesize))
          stop(filepath, ": file not found")
-    filesize <- as.integer(filesize)
-    if (is.na(filesize))
-        stop(filepath, ": file is too big")
-    xraw <- Biostrings:::XRaw(filesize)
-    # Takes 0.5 second on lamb1!
-    .Call("XRaw_loadFASTA", xraw@xp, filepath, "", NULL, PACKAGE="Biostrings")
-    # or use safe wrapper:
-    Biostrings:::XRaw.loadFASTA(xraw, filepath)
+     filesize <- as.integer(filesize)
+     if (is.na(filesize))
+         stop(filepath, ": file is too big")
+     xraw <- Biostrings:::XRaw(filesize)
+
+     # Takes < 1 second on lamb1!
+     .Call("XRaw_loadFASTA", xraw@xp, filepath, "", NULL, PACKAGE="Biostrings")
+
+     # or use safe wrapper:
+     Biostrings:::XRaw.loadFASTA(xraw, filepath)
+
+   Compare to the time it takes to load Hsapiens$chr1 from the
+   BSgenome.Hsapiens.UCSC.hg18 package: 1.340 second on lamb1!
+   Conclusion: we could put and load directly the FASTA files in the
+   BSgenome.* packages. The DNAString and BStringViews instances would be
+   created on the fly. No need to store them in .rda files anymore!
+
 */
 
 SEXP XRaw_loadFASTA(SEXP xraw_xp, SEXP filepath, SEXP collapse, SEXP lkup)
