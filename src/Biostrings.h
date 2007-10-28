@@ -153,7 +153,7 @@ int _Biostrings_report_match(
 		int Rpos
 );
 
-char *fgets_rtrimmed(
+int fgets_rtrimmed(
 		char *s,
 		int size,
 		FILE *stream

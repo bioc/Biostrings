@@ -1,5 +1,4 @@
 #include "Biostrings.h"
-#include <ctype.h>
 
 static int debug = 0;
 
@@ -704,7 +703,7 @@ SEXP XRaw_loadFASTA(SEXP xraw_xp, SEXP filepath, SEXP collapse, SEXP lkup)
 
 	dest = R_ExternalPtrTag(xraw_xp);
 	nbyte_max = LENGTH(dest);
-	path = CHAR(STRING_ELT(filepath, 0));
+	path = translateChar(STRING_ELT(filepath, 0));
 	coll = CHAR(STRING_ELT(collapse, 0));
 	gaplen = strlen(coll);
 
@@ -713,21 +712,13 @@ SEXP XRaw_loadFASTA(SEXP xraw_xp, SEXP filepath, SEXP collapse, SEXP lkup)
 	lineno = L = i1 = 0;
 	status = 0; /* 0: expecting desc; 1: expecting seq; 2: no expectation */
 	_Biostrings_reset_views_buffer();
-	/* TODO: Try to use fgets_rtrimmed() (defined in utils.c) instead of fgets() */
-	while (fgets(line, FASTALINE_MAX+1, infile) != NULL) {
+	while ((line_len = fgets_rtrimmed(line, FASTALINE_MAX+1, infile)) != -1) {
+	/* while (fgets(line, FASTALINE_MAX+1, infile) != NULL) { */
 		lineno++;
-		line_len = strlen(line);
 		if (line_len >= FASTALINE_MAX) {
 			fclose(infile);
 			error("file contains lines that are too long");
 		}
-
-		/* When fgets() is replaced by fgets_rtrimmed(), remove the 4 lines below */
-		i = line_len - 1;
-		while (i >= 0 && isspace(line[i])) i--;
-		line_len = i + 1;
-		line[line_len] = 0;
-
 		if (line_len == 0)
 			continue;
 		c0 = line[0];
@@ -739,15 +730,15 @@ SEXP XRaw_loadFASTA(SEXP xraw_xp, SEXP filepath, SEXP collapse, SEXP lkup)
 				error("file does not seem to be FASTA");
 			}
 			i2 = i1 + line_len - 1;
-			_Biostrings_memcpy_to_i1i2(i1, i2,
-				(char *) RAW(dest), nbyte_max,
-				line, line_len, sizeof(char));
-/*
-			_Biostrings_translate_charcpy_to_i1i2(i1, i2,
-				(char *) RAW(dest), nbyte_max,
-				line, line_len,
-				INTEGER(lkup), LENGTH(lkup));
-*/
+			if (lkup == R_NilValue)
+				_Biostrings_memcpy_to_i1i2(i1, i2,
+					(char *) RAW(dest), nbyte_max,
+					line, line_len, sizeof(char));
+			else
+				_Biostrings_translate_charcpy_to_i1i2(i1, i2,
+					(char *) RAW(dest), nbyte_max,
+					line, line_len,
+					INTEGER(lkup), LENGTH(lkup));
 			i1 = i2 + 1;
 			status = 2;
 			continue;

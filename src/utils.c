@@ -578,17 +578,32 @@ int _Biostrings_report_match(int Lpos, int Rpos)
  * --------------------------------------------------------------------------
  */
 
-/* Like fgets() except that the string stored into the buffer pointed to by s
-   is right-trimmed i.e. all the rightmost white-space characters were
-   removed */
-char *fgets_rtrimmed(char *s, int size, FILE *stream)
+/* Like fgets() except that:
+ *   - the string stored into the buffer pointed to by s is right-trimmed i.e.
+ *     all the rightmost white-space characters were removed,
+ *   - return the length of the string stored into the buffer pointed to by s
+ *     on success and -1 on error or when end of file occurs while no
+ *     characters have been read.
+ */
+int fgets_rtrimmed(char *s, int size, FILE *stream)
 {
-	int i, c;
+	char *s1;
+	int line_len, i;
+	long pos0;
 
-	error("fgets_rtrimmed() is not ready yet");
-	for (i = 0; i < size - 1; i++) {
-		c = fgetc(stream);
-	}
-	return s;
+	pos0 = ftell(stream);
+	s1 = fgets(s, size, stream);
+	if (s1 == NULL)
+		return -1;
+	/* 2 almost equivalent ways to get the length of the current line,
+	   "almost" because of they will differ if a line contains embedded
+	   NUL characters */
+	line_len = ftell(stream) - pos0; /* should be faster than strlen() */
+	/* line_len = strlen(s); */
+	i = line_len - 1;
+	while (i >= 0 && isspace(s[i])) i--;
+	line_len = i + 1;
+	s[line_len] = 0;
+	return line_len;
 }
 

@@ -284,6 +284,9 @@ XRaw.saveFASTA <- function(x, filepath, dec_lkup=NULL)
 
 ### Return a list of 4 elements (see comments for XRaw_loadFASTA() in
 ### src/XRaw.c for the details).
+### 'filepath' must a path to an uncompressed FASTA file. Note that,
+### unlike with the file() function, it cannot an URL, '""', '"stdin"'
+### or '"clipboard"'.
 XRaw.loadFASTA <- function(x, filepath, collapse="", enc_lkup=NULL)
 {
     if (!is.character(filepath) || length(filepath) != 1 || is.na(filepath))
@@ -292,6 +295,7 @@ XRaw.loadFASTA <- function(x, filepath, collapse="", enc_lkup=NULL)
         stop("'collapse' must be a character string (cannot be NA)")
     if (!is.null(enc_lkup) && !is.integer(enc_lkup))
         stop("'enc_lkup' must be an integer vector")
+    filepath <- path.expand(filepath)
     .Call("XRaw_loadFASTA",
           x@xp, filepath, collapse, enc_lkup, PACKAGE="Biostrings")
 }
