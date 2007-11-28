@@ -105,8 +105,8 @@ setMethod("initialize", "BStringCodec",
 ###   > rna <- RNAString(dna)
 ### This is almost instantaneous (even on a 100M-letter DNA) because the data
 ### in 'dna' are not copied ('dna' and 'rna' share the same XRaw).
-DNA_BASE_CODES <- c(A=1, C=2, G=4, T=8)
-RNA_BASE_CODES <- c(U=1, G=2, C=4, A=8)
+DNA_BASE_CODES <- c(A=1L, C=2L, G=4L, T=8L)
+RNA_BASE_CODES <- c(U=1L, G=2L, C=4L, A=8L)
 
 IUPAC2codes <- function(baseCodes)
 {
@@ -132,6 +132,17 @@ BStringCodec.DNAorRNA <- function(alphabet, baseCodes)
 
 DNA_STRING_CODEC <- BStringCodec.DNAorRNA(DNA_ALPHABET, DNA_BASE_CODES)
 RNA_STRING_CODEC <- BStringCodec.DNAorRNA(RNA_ALPHABET, RNA_BASE_CODES)
+
+### Return the lookup table that transforms a DNA (or RNA) sequence into its
+### complementary sequence.
+### IMPORTANT: Assumes that DNA_STRING_CODEC and RNA_STRING_CODEC are
+### complementary codecs.
+getDNAComplementLookup <- function()
+{
+    lkup <- DNA_STRING_CODEC@dec_lkup
+    lkup[lkup %in% letterAsByteVal("T")] <- letterAsByteVal("U")
+    RNA_STRING_CODEC@enc_lkup[lkup + 1]
+}
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
