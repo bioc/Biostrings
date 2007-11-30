@@ -120,7 +120,7 @@ SEXP bits_per_long()
 {
 	SEXP ans;
 
-	PROTECT(ans = allocVector(INTSXP, 1));
+	PROTECT(ans = NEW_INTEGER(1));
 	INTEGER(ans)[0] = BITS_PER_LONG;
 	UNPROTECT(1);
 	return ans;
@@ -234,12 +234,11 @@ static int _next_match(
 	return -1;
 }
 
-static int _match_shiftor(const char *P, int nP,
-		const char *S, int nS, int is_count_only,
+static void _match_shiftor(const char *P, int nP, const char *S, int nS, 
 		int PMmask_length, int is_fixed)
 {
 	ShiftOrWord_t *PMmask, pmaskmap[256];
-	int count = 0, i, e, Lpos, Rpos, ret;
+	int i, e, Lpos, Rpos, ret;
 
 #ifdef DEBUG_BIOSTRINGS
 	if (debug) {
@@ -271,16 +270,7 @@ static int _match_shiftor(const char *P, int nP,
 		if (ret == -1) {
 			break;
 		}
-#ifdef DEBUG_BIOSTRINGS
-		if (debug) {
-			Rprintf("[DEBUG] _match_shiftor(): ");
-			Rprintf("match found for Lpos=%d Rpos=%d\n",
-				Lpos-1, Rpos-1);
-		}
-#endif
-		if (!is_count_only)
-			_Biostrings_report_match(Lpos - 1, 0);
-		count++;
+		_Biostrings_report_match(Lpos - 1, 0);
 	}
 	/* No need to free PMmask, R does that for us */
 #ifdef DEBUG_BIOSTRINGS
@@ -288,7 +278,7 @@ static int _match_shiftor(const char *P, int nP,
 		Rprintf("[DEBUG] _match_shiftor(): END\n");
 	}
 #endif
-	return count;
+	return;
 }
 
 /*
@@ -310,7 +300,7 @@ SEXP match_shiftor(SEXP p_xp, SEXP p_offset, SEXP p_length,
 		SEXP mismatch, SEXP fixed, SEXP count_only)
 {
 	int pat_offset, pat_length, subj_offset, subj_length,
-	    kerr, fixedP, fixedS, is_count_only, count;
+	    kerr, fixedP, fixedS, is_count_only;
 	const Rbyte *pat, *subj;
 	SEXP ans;
 
@@ -329,20 +319,13 @@ SEXP match_shiftor(SEXP p_xp, SEXP p_offset, SEXP p_length,
 		error("fixedP != fixedS not yet supported");
 	is_count_only = LOGICAL(count_only)[0];
 
-	if (!is_count_only)
-		_Biostrings_reset_views_buffer();
-	count = _match_shiftor((char *) pat, pat_length,
-			(char *) subj, subj_length,
-			is_count_only, kerr+1, fixedP);
-
-	if (!is_count_only) {
-		PROTECT(ans = allocVector(INTSXP, count));
-		memcpy(INTEGER(ans), _Biostrings_get_views_start(),
-					sizeof(int) * count);
-	} else {
-		PROTECT(ans = allocVector(INTSXP, 1));
-		INTEGER(ans)[0] = count;
-	}
+	_Biostrings_reset_viewsbuf(is_count_only ? 1 : 2);
+	_match_shiftor((char *) pat, pat_length, (char *) subj, subj_length,
+		       kerr+1, fixedP);
+	if (is_count_only)
+		PROTECT(ans = _Biostrings_viewsbuf_count_asINTEGER());
+	else
+		PROTECT(ans = _Biostrings_viewsbuf_start_asINTEGER());
 	UNPROTECT(1);
 	return ans;
 }

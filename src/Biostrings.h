@@ -143,6 +143,36 @@ int fgets_rtrimmed(
 );
 
 
+/* views_buffer.c */
+
+SEXP Biostrings_debug_views_buffer();
+
+void _Biostrings_reset_viewsbuf(
+		int reporting_mode
+);
+
+int _Biostrings_report_view(
+		int start,
+		int end,
+		const char *desc
+);
+
+int _Biostrings_report_match(
+		int Lpos,
+		int Rpos
+);
+
+SEXP _Biostrings_viewsbuf_count_asINTEGER();
+
+SEXP _Biostrings_viewsbuf_start_asINTEGER();
+
+SEXP _Biostrings_viewsbuf_end_asINTEGER();
+
+SEXP _Biostrings_viewsbuf_desc_asCHARACTER();
+
+SEXP _Biostrings_viewsbuf_asLIST();
+
+
 /* XRaw.c */
 
 SEXP Biostrings_debug_XRaw();

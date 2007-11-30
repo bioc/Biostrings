@@ -19,13 +19,14 @@ SEXP find_palindromes_debug()
 
 /****************************************************************************/
 
-static int naive_palindrome_search(const char *S, int nS, int armlen_min, int ngaps_max)
+static void naive_palindrome_search(const char *S, int nS, int armlen_min, int ngaps_max)
 {
-	int count = 0, n1, n2, ngaps, armlen, Lpos, Rpos;
+	int n1, n2, ngaps, armlen, Lpos, Rpos, all_letter0;
+	char letter0;
 
 #ifdef DEBUG_BIOSTRINGS
 	if (debug) {
-		Rprintf("[DEBUG] naive_antipalindrome_search(): nS=%d armlen_min=%d ngaps_max=%d\n",
+		Rprintf("[DEBUG] naive_palindrome_search(): nS=%d armlen_min=%d ngaps_max=%d\n",
 			nS, armlen_min, ngaps_max);
 	}
 #endif
@@ -35,24 +36,47 @@ static int naive_palindrome_search(const char *S, int nS, int armlen_min, int ng
 			Lpos = n1 - 1;
 			Rpos = n1 + ngaps;
 			while (0 <= Lpos && Rpos < nS && S[Lpos] == S[Rpos]) {
+				if (ngaps == 0) {
+					if (armlen == 0) {
+						letter0 = S[Rpos];
+						all_letter0 = 1;
+					} else {
+						if (S[Rpos] != letter0)
+							all_letter0 = 0;
+					} 
+				}
 				armlen++;
 				Lpos--;
 				Rpos++;
 			}
-			if (armlen < armlen_min)
-				continue;
-			_Biostrings_report_match(++Lpos, --Rpos);
-			count++;
+			Lpos++;
+			if (ngaps == 0 && armlen != 0 && all_letter0) {
+				// The current palindrome is in fact the left part of a region where the
+				// same letter (letter0) is repeated. We move to the right end of this region.
+				while (Rpos < nS && S[Rpos] == letter0)
+					Rpos++;
+				if (Rpos - Lpos < 2 * armlen_min)
+					continue;
+				Rpos--;
+				n1 = Rpos;
+				n2 = Rpos + armlen_min;
+			} else {
+				if (armlen < armlen_min)
+					continue;
+				Rpos--;
+			}
+			_Biostrings_report_match(Lpos, Rpos);
 			break;
 		}
 	}
-	return count;
+	return;
 }
 
-static int naive_antipalindrome_search(const char *S, int nS, int armlen_min, int ngaps_max,
+static void naive_antipalindrome_search(const char *S, int nS, int armlen_min, int ngaps_max,
 		const int *lkup, int lkup_length)
 {
-	int count = 0, n1, n2, ngaps, armlen, Lpos, Rpos, lkup_key, lkup_val;
+	int n1, n2, ngaps, armlen, Lpos, Rpos, all_letter0, lkup_key, lkup_val;
+	char letter0;
 
 #ifdef DEBUG_BIOSTRINGS
 	if (debug) {
@@ -72,18 +96,42 @@ static int naive_antipalindrome_search(const char *S, int nS, int armlen_min, in
 				}
 				if (((char) lkup_val) != S[Rpos])
 					break;
+				if (ngaps == 0) {
+					if (armlen == 0) {
+						letter0 = S[Rpos];
+						// Will be 1 iff S[Rpos] is its own complementary (only
+						// IUPAC letter N and the gap letter - have this property)
+						all_letter0 = S[Lpos] == S[Rpos];
+					} else {
+						if (S[Rpos] != letter0)
+							all_letter0 = 0;
+					} 
+				}
 				armlen++;
 				Lpos--;
 				Rpos++;
 			}
-			if (armlen < armlen_min)
-				continue;
-			_Biostrings_report_match(++Lpos, --Rpos);
-			count++;
+			Lpos++;
+			if (ngaps == 0 && armlen != 0 && all_letter0) {
+				// The current palindrome is in fact the left part of a region where the
+				// same letter (letter0) is repeated. We move to the right end of this region.
+				while (Rpos < nS && S[Rpos] == letter0)
+					Rpos++;
+				if (Rpos - Lpos < 2 * armlen_min)
+					continue;
+				Rpos--;
+				n1 = Rpos;
+				n2 = Rpos + armlen_min;
+			} else {
+				if (armlen < armlen_min)
+					continue;
+				Rpos--;
+			}
+			_Biostrings_report_match(Lpos, Rpos);
 			break;
 		}
 	}
-	return count;
+	return;
 }
 
 /*
@@ -100,7 +148,7 @@ SEXP find_palindromes(SEXP s_xp, SEXP s_offset, SEXP s_length,
 	subj = RAW(R_ExternalPtrTag(s_xp)) + subj_offset;
 	armlen_min = INTEGER(min_armlength)[0];
 	ngaps_max = INTEGER(max_ngaps)[0];
-	_Biostrings_reset_views_buffer();
+	_Biostrings_reset_viewsbuf(3);
 	if (L2R_lkup == R_NilValue)
 		naive_palindrome_search((char *) subj, subj_length,
 			armlen_min, ngaps_max);
@@ -108,6 +156,6 @@ SEXP find_palindromes(SEXP s_xp, SEXP s_offset, SEXP s_length,
 		naive_antipalindrome_search((char *) subj, subj_length,
 			armlen_min, ngaps_max,
 			INTEGER(L2R_lkup), LENGTH(L2R_lkup));
-	return _Biostrings_get_views_LIST();
+	return _Biostrings_viewsbuf_asLIST();
 }
 

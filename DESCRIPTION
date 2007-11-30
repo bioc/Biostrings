@@ -33,6 +33,7 @@ Collate: 00datacache.R
         matchLRPatterns.R
         matchProbePair.R
         findPalindromes.R
+        findPalindromes.R
         align-utils.R
         pmatchPattern.R
         needwunsQS.R

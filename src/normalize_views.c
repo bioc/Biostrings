@@ -7,12 +7,12 @@
  * Assumes that 'start[i] <= end[i]' for all 0 <= i < nviews
  * and that 'start' is sorted in increasing order.
  */
-static int normalize_views(const int *start, const int *end, int nviews)
+static void normalize_views(const int *start, const int *end, int nviews)
 {
 	int start0, end0, start1, end1, i;
 
 	if (nviews == 0)
-		return 0;
+		return;
 	start0 = start[0];
 	end0 = end[0];
 	for (i = 1; i < nviews; i++) {
@@ -23,11 +23,12 @@ static int normalize_views(const int *start, const int *end, int nviews)
 				end0 = end1;
 			continue;
 		}
-		_Biostrings_report_view(start0, end0, "");
+		_Biostrings_report_view(start0, end0, NULL);
 		start0 = start1;
 		end0 = end1;
 	}
-	return _Biostrings_report_view(start0, end0, "");
+	_Biostrings_report_view(start0, end0, NULL);
+	return;
 }
 
 /*
@@ -36,8 +37,8 @@ static int normalize_views(const int *start, const int *end, int nviews)
  */
 SEXP Biostrings_normalize_views(SEXP start, SEXP end)
 {
-	_Biostrings_reset_views_buffer();
+	_Biostrings_reset_viewsbuf(0);
 	normalize_views(INTEGER(start), INTEGER(end), LENGTH(start));
-	return _Biostrings_get_views_LIST();
+	return _Biostrings_viewsbuf_asLIST();
 }
 
