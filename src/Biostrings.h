@@ -398,28 +398,6 @@ SEXP char_frequency(
 );
 
 
-/* views_buffer.c */
-
-void _Biostrings_reset_views_buffer();
-
-int *_Biostrings_get_views_start();
-int *_Biostrings_get_views_end();
-char **_Biostrings_get_views_desc();
-
-int _Biostrings_report_view(
-		int start,
-		int end,
-		const char *desc
-);
-
-int _Biostrings_report_match(
-		int Lpos,
-		int Rpos
-);
-
-SEXP _Biostrings_get_views_LIST();
-
-
 /* normalize_views.c */
 
 SEXP Biostrings_normalize_views(
