@@ -6,8 +6,7 @@
 
 setClassUnion("BStringLike", c("BString", "DNAString", "RNAString", "AAString"))
 
-setClass(
-    "BStringViews",
+setClass("BStringViews",
     representation(
         subject="BStringLike",
         ## The 'views' slot must be a "valid views data frame" i.e. a data
