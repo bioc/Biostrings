@@ -13,7 +13,7 @@ Solves the (Needleman-Wunsch) global alignment and (Smith-Waterman) local alignm
 \usage{
 pairwiseAlignment(string1, string2, quality1 = 22L, quality2 = 22L, type = "global",
                   substitutionMatrix = NULL, gapOpening = -10, gapExtension = -0.5,
-                  endGap = TRUE, scoreOnly = FALSE)
+                  scoreOnly = FALSE)
 }
 \arguments{
   \item{string1, string2}{a character vector of length 1 or an \code{\link{XString}} object.}
@@ -30,8 +30,6 @@ pairwiseAlignment(string1, string2, quality1 = 22L, quality2 = 22L, type = "glob
     arguments.}
   \item{gapOpening}{penalty for opening a gap in the alignment.}
   \item{gapExtension}{penalty for extending a gap in the alignment.}
-  \item{endGap}{logical to denote whether or not to penalize end gaps like internal gaps
-    when \code{type = "global"}. If \code{FALSE}, end/terminal gaps are not penalized.}
   \item{scoreOnly}{logical to denote whether or not to only return the scores of the
     optimal pairwise alignment. (See Value section below.)}
 }

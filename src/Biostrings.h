@@ -1157,7 +1157,6 @@ SEXP align_pairwiseAlignment(
 	SEXP gapCode,
 	SEXP typeCode,
 	SEXP scoreOnly,
-	SEXP endGap,
 	SEXP gapOpening,
 	SEXP gapExtension,
 	SEXP qualityLookupTable,

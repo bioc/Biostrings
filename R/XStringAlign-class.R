@@ -15,8 +15,7 @@ setClass("XStringAlign",
         score="numeric",
         constantMatrix="matrix",
         gapOpening="numeric",
-        gapExtension="numeric",
-        endGap="logical"
+        gapExtension="numeric"
     )
 )
 
@@ -26,7 +25,7 @@ setClass("XStringAlign",
 ###
 
 setMethod("initialize", "XStringAlign",
-    function(.Object, align1, align2, quality1, quality2, type, score, constantMatrix, gapOpening, gapExtension, endGap)
+    function(.Object, align1, align2, quality1, quality2, type, score, constantMatrix, gapOpening, gapExtension)
     {
         if (!identical(class(align1), class(align2)))
             stop("'align1' and 'align2' must be XString objects of the same subtype")
@@ -40,9 +39,6 @@ setMethod("initialize", "XStringAlign",
         gapExtension <- as.double(- abs(gapExtension))
         if (is.na(gapExtension) || length(gapExtension) != 1)
             stop("'gapExtension' must be a non-positive numeric vector of length 1")
-        endGap <- as.logical(endGap)
-        if (length(endGap) != 1 || any(is.na(endGap)))
-            stop("'endGap' must be a non-missing logical value")
 		.Object@align1 <- align1
         .Object@align2 <- align2
         .Object@quality1 <- quality1
@@ -52,7 +48,6 @@ setMethod("initialize", "XStringAlign",
         .Object@constantMatrix <- constantMatrix
         .Object@gapOpening <- gapOpening
         .Object@gapExtension <- gapExtension
-        .Object@endGap <- endGap
         .Object
     }
 )

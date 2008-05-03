@@ -42,7 +42,6 @@ static float pairwiseAlignment(
 		char gapCode,
 		int typeCode,
 		int scoreOnly,
-		int endGap,
 		float gapOpening,
 		float gapExtension,
 		const int *qualityLookupTable,
@@ -73,7 +72,7 @@ static float pairwiseAlignment(
 		hMatrix = (float *) R_alloc((long) (nCharString1 + 1) * (nCharString2 + 1), sizeof(float));
 		vMatrix = (float *) R_alloc((long) (nCharString1 + 1) * (nCharString2 + 1), sizeof(float));		
 	}
-	if (typeCode == GLOBAL_ALIGNMENT && endGap) {
+	if (typeCode == GLOBAL_ALIGNMENT) {
 		for (i = 0; i <= nCharString1; i++)
 			H_MATRIX(i, 0) = gapOpening + i * gapExtension;
 		for (j = 0; j <= nCharString2; j++)
@@ -209,22 +208,6 @@ static float pairwiseAlignment(
 		}
 	}
 	if (typeCode == GLOBAL_ALIGNMENT) {
-		if (endGap == 0) {
-			for (i = 1, iMinus1 = 0; i <= nCharString1; i++, iMinus1++) {
-				if (H_MATRIX(i, nCharString2) < H_MATRIX(iMinus1, nCharString2)) {
-					H_MATRIX(i, nCharString2) = H_MATRIX(iMinus1, nCharString2);
-					if (H_MATRIX(i, nCharString2) >= MAX(F_MATRIX(i, nCharString2), V_MATRIX(i, nCharString2)))
-						TRACE_MATRIX(i, nCharString2) = DELETION;
-				}
-			}
-			for (j = 1, jMinus1 = 0; j <= nCharString2; j++, jMinus1++) {
-				if (V_MATRIX(nCharString1, j) < V_MATRIX(nCharString1, jMinus1)) {
-					V_MATRIX(nCharString1, j) = V_MATRIX(nCharString1, jMinus1);
-					if (V_MATRIX(nCharString1, j) >= MAX(F_MATRIX(nCharString1, j), H_MATRIX(nCharString1, j)))
-						TRACE_MATRIX(nCharString1, j) = INSERTION;
-				}
-			}
-		}
 		startRow = nCharString1;
 		startCol = nCharString2;
 		startScore =
@@ -340,9 +323,6 @@ static float pairwiseAlignment(
  * 'scoreOnly':              denotes whether or not to only return the scores
  *                           of the optimal pairwise alignment
  *                           (logical vector of length 1)
- * 'endGap':                 denote whether or not to penalize end gaps like
- *                           internal gaps.
- *                           (logical vector of length 1)
  * 'gapOpening':             gap opening cost or penalty
  *                           (double vector of length 1)
  * 'gapExtension':           gap extension cost or penalty
@@ -376,7 +356,6 @@ SEXP align_pairwiseAlignment(
 		SEXP gapCode,
 		SEXP typeCode,
 		SEXP scoreOnly,
-		SEXP endGap,
 		SEXP gapOpening,
 		SEXP gapExtension,
 		SEXP qualityLookupTable,
@@ -399,7 +378,6 @@ SEXP align_pairwiseAlignment(
 			(char) RAW(gapCode)[0],
 			INTEGER(typeCode)[0],
 			LOGICAL(scoreOnly)[0],
-			LOGICAL(endGap)[0],
 			(float) REAL(gapOpening)[0],
 			(float) REAL(gapExtension)[0],
 			INTEGER(qualityLookupTable),

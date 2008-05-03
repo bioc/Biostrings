@@ -87,8 +87,7 @@ substitution scores and the gap penalties:
   Gaps have the potential to incur a cost when they are introduced and when they
   are extended in an optimal pairwise alignment. The former is regulated by the
   \Rfunarg{gapOpening} argument and the latter by the \Rfunarg{gapExtension}
-  argument. For global alignments, end/terminal gaps can be ignored by setting
-  the \Rfunarg{endGap} argument to \texttt{FALSE}.
+  argument.
 \end{itemize}
 
 The \Rfunction{pairwiseAlignment} function uses memory and computation time

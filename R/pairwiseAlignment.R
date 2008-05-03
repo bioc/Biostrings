@@ -20,7 +20,6 @@ function(string1,
          substitutionMatrix = NULL,
          gapOpening = -10,
          gapExtension = -0.5,
-         endGap = TRUE,
          scoreOnly = FALSE)
 {
   ## Check arguments
@@ -34,9 +33,6 @@ function(string1,
   gapExtension <- as.double(- abs(gapExtension))
   if (is.na(gapExtension) || length(gapExtension) != 1)
     stop("'gapExtension' must be a non-positive numeric vector of length 1")
-  endGap <- as.logical(endGap)
-  if (length(endGap) != 1 || any(is.na(endGap)))
-    stop("'endGap' must be a non-missing logical value")
   scoreOnly <- as.logical(scoreOnly)
   if (length(scoreOnly) != 1 || any(is.na(scoreOnly)))
     stop("'scoreOnly' must be a non-missing logical value")
@@ -132,7 +128,6 @@ function(string1,
                   gapCode,
                   typeCode,
                   scoreOnly,
-                  endGap,
                   gapOpening,
                   gapExtension,
                   qualityLookupTable,
@@ -163,8 +158,7 @@ function(string1,
                   score = answer[["score"]],
                   constantMatrix = constantMatrix,
                   gapOpening = gapOpening,
-                  gapExtension = gapExtension,
-                  endGap = endGap)
+                  gapExtension = gapExtension)
   }
   return(output)
 }
@@ -174,7 +168,7 @@ setGeneric("pairwiseAlignment", signature = c("string1", "string2"),
            function(string1, string2, quality1 = 22L, quality2 = 22L,
                     type = "global", substitutionMatrix = NULL,
                     gapOpening = -10, gapExtension = -0.5,
-                    endGap = TRUE, scoreOnly = FALSE)
+                    scoreOnly = FALSE)
            standardGeneric("pairwiseAlignment"))
 
 setMethod("pairwiseAlignment",
@@ -182,7 +176,7 @@ setMethod("pairwiseAlignment",
           function(string1, string2, quality1 = 22L, quality2 = 22L,
                    type = "global", substitutionMatrix = NULL,
                    gapOpening = -10, gapExtension = -0.5,
-                   endGap = TRUE, scoreOnly = FALSE)
+                   scoreOnly = FALSE)
           XString.pairwiseAlignment(BString(string1), BString(string2),
                                     quality1 = quality1,
                                     quality2 = quality2,
@@ -190,7 +184,6 @@ setMethod("pairwiseAlignment",
                                     substitutionMatrix = substitutionMatrix,
                                     gapExtension = gapExtension,
                                     gapOpening = gapOpening,
-                                    endGap = endGap,
                                     scoreOnly = scoreOnly))
 
 setMethod("pairwiseAlignment",
@@ -198,7 +191,7 @@ setMethod("pairwiseAlignment",
           function(string1, string2, quality1 = 22L, quality2 = 22L,
                    type = "global", substitutionMatrix = NULL,
                    gapOpening = -10, gapExtension = -0.5,
-                   endGap = TRUE, scoreOnly = FALSE)
+                   scoreOnly = FALSE)
           XString.pairwiseAlignment(XString(class(string2), string1), string2,
                                     quality1 = quality1,
                                     quality2 = quality2,
@@ -206,7 +199,6 @@ setMethod("pairwiseAlignment",
                                     substitutionMatrix = substitutionMatrix,
                                     gapExtension = gapExtension,
                                     gapOpening = gapOpening,
-                                    endGap = endGap,
                                     scoreOnly = scoreOnly))
 
 setMethod("pairwiseAlignment",
@@ -214,7 +206,7 @@ setMethod("pairwiseAlignment",
           function(string1, string2, quality1 = 22L, quality2 = 22L,
                    type = "global", substitutionMatrix = NULL,
                    gapOpening = -10, gapExtension = -0.5,
-                   endGap = TRUE, scoreOnly = FALSE)
+                   scoreOnly = FALSE)
           XString.pairwiseAlignment(string1, XString(class(string1), string2),
                                     quality1 = quality1,
                                     quality2 = quality2,
@@ -222,7 +214,6 @@ setMethod("pairwiseAlignment",
                                     substitutionMatrix = substitutionMatrix,
                                     gapExtension = gapExtension,
                                     gapOpening = gapOpening,
-                                    endGap = endGap,
                                     scoreOnly = scoreOnly))
 
 setMethod("pairwiseAlignment",
@@ -230,7 +221,7 @@ setMethod("pairwiseAlignment",
           function(string1, string2, quality1 = 22L, quality2 = 22L,
                    type = "global", substitutionMatrix = NULL,
                    gapOpening = -10, gapExtension = -0.5,
-                   endGap = TRUE, scoreOnly = FALSE)
+                   scoreOnly = FALSE)
           XString.pairwiseAlignment(string1, string2,
                                     quality1 = quality1,
                                     quality2 = quality2,
@@ -238,5 +229,4 @@ setMethod("pairwiseAlignment",
                                     substitutionMatrix = substitutionMatrix,
                                     gapExtension = gapExtension,
                                     gapOpening = gapOpening,
-                                    endGap = endGap,
                                     scoreOnly = scoreOnly))
