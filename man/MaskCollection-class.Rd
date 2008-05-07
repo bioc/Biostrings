@@ -7,10 +7,14 @@
 \alias{MaskCollection}
 
 % Basic accessor methods:
-\alias{nirlist}
-\alias{nirlist,MaskCollection-method}
+\alias{nir_list}
+\alias{nir_list,MaskCollection-method}
 \alias{length,MaskCollection-method}
 \alias{width,MaskCollection-method}
+\alias{active}
+\alias{active,MaskCollection-method}
+\alias{active<-}
+\alias{active<-,MaskCollection-method}
 \alias{names,MaskCollection-method}
 \alias{names<-,MaskCollection-method}
 
@@ -93,11 +97,16 @@
       "put on".
     }
     \item{}{
+      \code{active(x)}:
+      A logical vector of the same length as \code{x} where each
+      element indicates whether the corresponding mask is active or not.
+    }
+    \item{}{
       \code{names(x)}:
       \code{NULL} or a character vector of the same length as \code{x}.
     }
     \item{}{
-      \code{nirlist(x)}:
+      \code{nir_list(x)}:
       A list of the same length as \code{x}, where each element is
       a \link{NormalIRanges} object representing a mask in \code{x}.
     }
@@ -114,6 +123,7 @@
       \code{end} and \code{width}.
       See the \code{\link{IRanges}} constructor (\code{?\link{IRanges}})
       for how \code{start}, \code{end} and \code{width} can be specified.
+      Note that the returned mask is active and unnamed.
     }
   }
 }
@@ -182,7 +192,7 @@
     \item{}{
       \code{reduce(x)}:
       Return a MaskCollection object of length 1 made of the union
-      (or merging, or collapsing) of all the masks in \code{x}.
+      (or merging, or collapsing) of all the active masks in \code{x}.
     }
     \item{}{
       \code{gaps(x)}:
@@ -195,6 +205,7 @@
 
 \seealso{
   \link{MaskedXString-class},
+  \code{\link{maskMotif}},
   \code{\link{alphabetFrequency}},
   \code{\link{matchPattern}},
   \link{NormalIRanges-class}
@@ -211,7 +222,7 @@
   width(mymasks)
 
   ## Putting a MaskCollection object on a sequence:
-  x <- DNAString("ACTCAAACTAGGATAGNACTTNNCCAGGC")
+  x <- DNAString("ACACAACTAGATAGNACTNNGAGAGACGC")
   x
   length(x)  # same as width(mymasks)
   nchar(x)   # same as length(x)
@@ -226,8 +237,13 @@
   x
   alphabetFrequency(x)
 
-  ## Some operations on the MaskCollection object itself:
+  ## Active/inactive masks:
   reduce(mymasks)
+  active(mymasks)[2] <- FALSE
+  mymasks
+  reduce(mymasks)
+
+  ## Other advanced operations:
   mymasks[[2]]
   length(mymasks[[2]])
   mymasks[[2]][-3]

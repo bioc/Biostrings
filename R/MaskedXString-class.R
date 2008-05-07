@@ -203,6 +203,17 @@ setAs("MaskedXString", "XStringViews",
     }
 )
 
+### NOT exported.
+toXStringViewsOrXString <- function(x)
+{
+    x0 <- unmasked(x)
+    mask1 <- reduce(masks(x))
+    if (isEmpty(mask1))
+        return(x0)
+    views <- gaps(mask1)[[1]]
+    new("XStringViews", x0, start=start(views), width=width(views), check=FALSE)
+}
+
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### The "nchar" method.
@@ -330,27 +341,6 @@ setReplaceMethod("masks", signature(x="MaskedXString", value="MaskCollection"),
             stop("the width of the mask collection must be equal ",
                  "to the length of the sequence")
         x@masks <- value
-        x
-    }
-)
-setReplaceMethod("masks", signature(x="MaskedXString", value="XString"),
-    function(x, value)
-    {
-        ## We need to remove the current masks before calling matchPattern()
-        masks(x) <- NULL
-        nir1 <- toNormalIRanges(matchPattern(value, x))
-        name1 <- paste(as.character(value), "-blocks", sep="")
-        masks(x) <- new("MaskCollection",
-                        nirlist=list(nir1),
-                        width=length(x),
-                        NAMES=name1)
-        x
-    }
-)
-setReplaceMethod("masks", signature(x="MaskedXString", value="character"),
-    function(x, value)
-    {
-        masks(x) <- XString(baseXStringSubtype(x), value)
         x
     }
 )
