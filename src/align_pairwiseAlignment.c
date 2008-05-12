@@ -164,6 +164,7 @@ static float pairwiseAlignment(
 			}
 		}
 	} else {
+		float gapOpeningPlusExtension = gapOpening + gapExtension;
 		for (i = 1, iMinus1 = 0; i <= nCharString1; i++, iMinus1++) {
 			SET_LOOKUP_VALUE(lookupTable, lookupTableLength, sequence1.elts[scalar1 ? 0 : iMinus1]);
 			element1 = lookupValue;
@@ -188,10 +189,10 @@ static float pairwiseAlignment(
 					}
 				}
 				H_MATRIX(i, j) = 
-					MAX(SAFE_SUM(F_MATRIX(iMinus1, j), gapOpening + gapExtension),
+					MAX(SAFE_SUM(F_MATRIX(iMinus1, j), gapOpeningPlusExtension),
 					    SAFE_SUM(H_MATRIX(iMinus1, j), gapExtension));
 				V_MATRIX(i, j) =
-					MAX(SAFE_SUM(F_MATRIX(i, jMinus1), gapOpening + gapExtension),
+					MAX(SAFE_SUM(F_MATRIX(i, jMinus1), gapOpeningPlusExtension),
 					    SAFE_SUM(V_MATRIX(i, jMinus1), gapExtension));
 
 				float scoreSubstitution = F_MATRIX(i, j);
