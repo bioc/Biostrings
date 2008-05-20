@@ -218,6 +218,11 @@ void _init_chrtrtable(
 
 SEXP debug_bufutils();
 
+void _IntBuf_set_val(
+	IntBuf *ibuf,
+	int val
+);
+
 IntBuf _new_IntBuf(
 	int buflength,
 	int nelt
@@ -229,9 +234,25 @@ void _IntBuf_insert_at(
 	int val
 );
 
+void _IntBuf_append(
+	IntBuf *ibuf,
+	int *vals,
+	int nval
+);
+
 void _IntBuf_delete_at(
 	IntBuf *ibuf,
 	int at
+);
+
+void _IntBuf_sum_val(
+	IntBuf *ibuf,
+	int val
+);
+
+void _IntBuf_sum_IntBuf(
+	IntBuf *ibuf1,
+	IntBuf *ibuf2
 );
 
 SEXP _IntBuf_asINTEGER(IntBuf *ibuf);
@@ -252,6 +273,16 @@ void _IntBBuf_insert_at(
 	IntBBuf *ibbuf,
 	int at,
 	IntBuf ibuf
+);
+
+void _IntBBuf_eltwise_append(
+	IntBBuf *ibbuf1,
+	IntBBuf *ibbuf2
+);
+
+void _IntBBuf_sum_val(
+	IntBBuf *ibbuf,
+	int val
 );
 
 SEXP _IntBBuf_asLIST(
@@ -1125,13 +1156,28 @@ SEXP ByName_MIndex_coverage(
 
 SEXP debug_match_TBdna();
 
-SEXP match_TBdna(
+SEXP XString_match_TBdna(
 	SEXP actree_nodes_xp,
 	SEXP actree_base_codes,
 	SEXP pdict_dups,
-	SEXP pdict_head_XStringSet,
-	SEXP pdict_tail_XStringSet,
-	SEXP subject_XString,
+	SEXP pdict_head,
+	SEXP pdict_tail,
+	SEXP subject,
+	SEXP max_mismatch,
+	SEXP fixed,
+	SEXP count_only,
+	SEXP envir
+);
+
+SEXP XStringViews_match_TBdna(
+	SEXP actree_nodes_xp,
+	SEXP actree_base_codes,
+	SEXP pdict_dups,
+	SEXP pdict_head,
+	SEXP pdict_tail,
+	SEXP subject,
+	SEXP views_start,
+	SEXP views_width,
 	SEXP max_mismatch,
 	SEXP fixed,
 	SEXP count_only,
@@ -1193,3 +1239,4 @@ SEXP align_pairwiseAlignment(
 	SEXP constantMatrix,
 	SEXP constantMatrixDim
 );
+
