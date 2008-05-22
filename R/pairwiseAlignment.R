@@ -19,7 +19,7 @@ function(string1,
          type = "global",
          substitutionMatrix = NULL,
          gapOpening = -10,
-         gapExtension = -2,
+         gapExtension = -4,
          scoreOnly = FALSE)
 {
   ## Check arguments
@@ -82,8 +82,8 @@ function(string1,
             function(e1,e2,n) e1 + e2 - (n/(n - 1)) * e1 * e2,
             n = nAlphabet)
     qualityLookupTable <- buildLookupTable(33:(99 + 33), 0:99)
-    qualityMatchMatrix <- log2((1 - errorMatrix) * nAlphabet) / 2
-    qualityMismatchMatrix <- log2(errorMatrix * (nAlphabet / (nAlphabet - 1))) / 2
+    qualityMatchMatrix <- log2((1 - errorMatrix) * nAlphabet)
+    qualityMismatchMatrix <- log2(errorMatrix * (nAlphabet / (nAlphabet - 1)))
 
     constantLookupTable <- integer(0)
     constantMatrix <- matrix(numeric(0), nrow = 0, ncol = 0)
@@ -167,7 +167,7 @@ function(string1,
 setGeneric("pairwiseAlignment", signature = c("string1", "string2"),
            function(string1, string2, quality1 = 22L, quality2 = 22L,
                     type = "global", substitutionMatrix = NULL,
-                    gapOpening = -10, gapExtension = -2,
+                    gapOpening = -10, gapExtension = -4,
                     scoreOnly = FALSE)
            standardGeneric("pairwiseAlignment"))
 
@@ -175,7 +175,7 @@ setMethod("pairwiseAlignment",
           signature(string1 = "character", string2 = "character"),
           function(string1, string2, quality1 = 22L, quality2 = 22L,
                    type = "global", substitutionMatrix = NULL,
-                   gapOpening = -10, gapExtension = -2,
+                   gapOpening = -10, gapExtension = -4,
                    scoreOnly = FALSE)
           XString.pairwiseAlignment(BString(string1), BString(string2),
                                     quality1 = quality1,
@@ -190,7 +190,7 @@ setMethod("pairwiseAlignment",
           signature(string1 = "character", string2 = "XString"),
           function(string1, string2, quality1 = 22L, quality2 = 22L,
                    type = "global", substitutionMatrix = NULL,
-                   gapOpening = -10, gapExtension = -2,
+                   gapOpening = -10, gapExtension = -4,
                    scoreOnly = FALSE)
           XString.pairwiseAlignment(XString(class(string2), string1), string2,
                                     quality1 = quality1,
@@ -205,7 +205,7 @@ setMethod("pairwiseAlignment",
           signature(string1 = "XString", string2 = "character"),
           function(string1, string2, quality1 = 22L, quality2 = 22L,
                    type = "global", substitutionMatrix = NULL,
-                   gapOpening = -10, gapExtension = -2,
+                   gapOpening = -10, gapExtension = -4,
                    scoreOnly = FALSE)
           XString.pairwiseAlignment(string1, XString(class(string1), string2),
                                     quality1 = quality1,
@@ -220,7 +220,7 @@ setMethod("pairwiseAlignment",
           signature(string1 = "XString", string2 = "XString"),
           function(string1, string2, quality1 = 22L, quality2 = 22L,
                    type = "global", substitutionMatrix = NULL,
-                   gapOpening = -10, gapExtension = -2,
+                   gapOpening = -10, gapExtension = -4,
                    scoreOnly = FALSE)
           XString.pairwiseAlignment(string1, string2,
                                     quality1 = quality1,
