@@ -12,10 +12,10 @@
 
 
 XString.pairwiseAlignment <-
-function(string1,
-         string2,
-         quality1 = 22L,
-         quality2 = 22L,
+function(pattern,
+         subject,
+         patternQuality = 22L,
+         subjectQuality = 22L,
          type = "global",
          substitutionMatrix = NULL,
          gapOpening = -10,
@@ -23,8 +23,8 @@ function(string1,
          scoreOnly = FALSE)
 {
   ## Check arguments
-  if (class(string1) != class(string2))
-    stop("'string1' and 'string2' must have the same class")
+  if (class(pattern) != class(subject))
+    stop("'pattern' and 'subject' must have the same class")
   type <- match.arg(tolower(type), c("global", "local", "overlap"))
   typeCode <- c("global" = 1L, "local" = 2L, "overlap" = 3L)[[type]]
   gapOpening <- as.double(- abs(gapOpening))
@@ -38,15 +38,15 @@ function(string1,
     stop("'scoreOnly' must be a non-missing logical value")
 
   ## Process string information
-  if (is.null(codec(string1))) {
+  if (is.null(codec(pattern))) {
     uniqueBases <-
-      unique(c(unique(charToRaw(as.character(string1))),
-               unique(charToRaw(as.character(string2)))))
+      unique(c(unique(charToRaw(as.character(pattern))),
+               unique(charToRaw(as.character(subject)))))
     alphabetToCodes <- as.integer(uniqueBases)
     names(alphabetToCodes) <- rawToChar(uniqueBases, multiple = TRUE)
     gapCode <- charToRaw("-")
   } else {
-    stringCodec <- codec(string1)
+    stringCodec <- codec(pattern)
     alphabetToCodes <- stringCodec@codes
     names(alphabetToCodes) <- stringCodec@letters
     gapCode <- as.raw(alphabetToCodes["-"])
@@ -54,24 +54,24 @@ function(string1,
 
   ## Generate quality-based and constant substitution matrix information
   if (is.null(substitutionMatrix)) {
-    if (is.numeric(quality1)) {
-      if (any(is.na(quality1)) || any(quality1 < 0 || quality1 > 99))
-        stop("integer 'quality1' values must be between 0 and 99")
-      quality1 <- rawToChar(as.raw(33L + as.integer(quality1)))
+    if (is.numeric(patternQuality)) {
+      if (any(is.na(patternQuality)) || any(patternQuality < 0 || patternQuality > 99))
+        stop("integer 'patternQuality' values must be between 0 and 99")
+      patternQuality <- rawToChar(as.raw(33L + as.integer(patternQuality)))
     }
-    if (!is(quality1, "XString"))
-      quality1 <- BString(quality1)
+    if (!is(patternQuality, "XString"))
+      patternQuality <- BString(patternQuality)
 
-    if (is.numeric(quality2)) {
-      if (any(is.na(quality2)) || any(quality2 < 0 || quality2 > 99))
-        stop("integer 'quality2' values must be between 0 and 99")
-      quality2 <- rawToChar(as.raw(33L + as.integer(quality2)))
+    if (is.numeric(subjectQuality)) {
+      if (any(is.na(subjectQuality)) || any(subjectQuality < 0 || subjectQuality > 99))
+        stop("integer 'subjectQuality' values must be between 0 and 99")
+      subjectQuality <- rawToChar(as.raw(33L + as.integer(subjectQuality)))
     }
-    if (!is(quality2, "XString"))
-      quality2 <- BString(quality2)
+    if (!is(subjectQuality, "XString"))
+      subjectQuality <- BString(subjectQuality)
 
     nAlphabet <-
-      switch(class(string1),
+      switch(class(pattern),
              DNAString =, RNAString = 4L,
              AAString = 20L,
              length(alphabetToCodes))
@@ -88,8 +88,8 @@ function(string1,
     constantLookupTable <- integer(0)
     constantMatrix <- matrix(numeric(0), nrow = 0, ncol = 0)
   } else {
-    quality1 <- BString("")
-    quality2 <- BString("")
+    patternQuality <- BString("")
+    subjectQuality <- BString("")
     qualityLookupTable <- integer(0)
     qualityMatchMatrix <- matrix(numeric(0), nrow = 0, ncol = 0)
     qualityMismatchMatrix <- matrix(numeric(0), nrow = 0, ncol = 0)
@@ -121,10 +121,10 @@ function(string1,
                        0:(length(availableLetters) - 1))
   }
   answer <- .Call("align_pairwiseAlignment",
-                  string1,
-                  string2,
-                  quality1,
-                  quality2,
+                  pattern,
+                  subject,
+                  patternQuality,
+                  subjectQuality,
                   gapCode,
                   typeCode,
                   scoreOnly,
@@ -142,18 +142,18 @@ function(string1,
     output <- answer[["score"]]
   } else {
     align1 <-
-      new(class(string1),
+      new(class(pattern),
           xdata = answer[["align1"]],
           length = length(answer[["align1"]]))
     align2 <-
-      new(class(string2),
+      new(class(subject),
           xdata = answer[["align2"]],
           length = length(answer[["align2"]]))
     output <- new("XStringAlign",
                   align1 = align1,
                   align2 = align2,
-                  quality1 = quality1,
-                  quality2 = quality2,
+                  patternQuality = patternQuality,
+                  subjectQuality = subjectQuality,
                   type = type,
                   score = answer[["score"]],
                   constantMatrix = constantMatrix,
@@ -164,22 +164,22 @@ function(string1,
 }
 
 
-setGeneric("pairwiseAlignment", signature = c("string1", "string2"),
-           function(string1, string2, quality1 = 22L, quality2 = 22L,
+setGeneric("pairwiseAlignment", signature = c("pattern", "subject"),
+           function(pattern, subject, patternQuality = 22L, subjectQuality = 22L,
                     type = "global", substitutionMatrix = NULL,
                     gapOpening = -10, gapExtension = -4,
                     scoreOnly = FALSE)
            standardGeneric("pairwiseAlignment"))
 
 setMethod("pairwiseAlignment",
-          signature(string1 = "character", string2 = "character"),
-          function(string1, string2, quality1 = 22L, quality2 = 22L,
+          signature(pattern = "character", subject = "character"),
+          function(pattern, subject, patternQuality = 22L, subjectQuality = 22L,
                    type = "global", substitutionMatrix = NULL,
                    gapOpening = -10, gapExtension = -4,
                    scoreOnly = FALSE)
-          XString.pairwiseAlignment(BString(string1), BString(string2),
-                                    quality1 = quality1,
-                                    quality2 = quality2,
+          XString.pairwiseAlignment(BString(pattern), BString(subject),
+                                    patternQuality = patternQuality,
+                                    subjectQuality = subjectQuality,
                                     type = type,
                                     substitutionMatrix = substitutionMatrix,
                                     gapExtension = gapExtension,
@@ -187,14 +187,14 @@ setMethod("pairwiseAlignment",
                                     scoreOnly = scoreOnly))
 
 setMethod("pairwiseAlignment",
-          signature(string1 = "character", string2 = "XString"),
-          function(string1, string2, quality1 = 22L, quality2 = 22L,
+          signature(pattern = "character", subject = "XString"),
+          function(pattern, subject, patternQuality = 22L, subjectQuality = 22L,
                    type = "global", substitutionMatrix = NULL,
                    gapOpening = -10, gapExtension = -4,
                    scoreOnly = FALSE)
-          XString.pairwiseAlignment(XString(class(string2), string1), string2,
-                                    quality1 = quality1,
-                                    quality2 = quality2,
+          XString.pairwiseAlignment(XString(class(subject), pattern), subject,
+                                    patternQuality = patternQuality,
+                                    subjectQuality = subjectQuality,
                                     type = type,
                                     substitutionMatrix = substitutionMatrix,
                                     gapExtension = gapExtension,
@@ -202,14 +202,14 @@ setMethod("pairwiseAlignment",
                                     scoreOnly = scoreOnly))
 
 setMethod("pairwiseAlignment",
-          signature(string1 = "XString", string2 = "character"),
-          function(string1, string2, quality1 = 22L, quality2 = 22L,
+          signature(pattern = "XString", subject = "character"),
+          function(pattern, subject, patternQuality = 22L, subjectQuality = 22L,
                    type = "global", substitutionMatrix = NULL,
                    gapOpening = -10, gapExtension = -4,
                    scoreOnly = FALSE)
-          XString.pairwiseAlignment(string1, XString(class(string1), string2),
-                                    quality1 = quality1,
-                                    quality2 = quality2,
+          XString.pairwiseAlignment(pattern, XString(class(pattern), subject),
+                                    patternQuality = patternQuality,
+                                    subjectQuality = subjectQuality,
                                     type = type,
                                     substitutionMatrix = substitutionMatrix,
                                     gapExtension = gapExtension,
@@ -217,14 +217,14 @@ setMethod("pairwiseAlignment",
                                     scoreOnly = scoreOnly))
 
 setMethod("pairwiseAlignment",
-          signature(string1 = "XString", string2 = "XString"),
-          function(string1, string2, quality1 = 22L, quality2 = 22L,
+          signature(pattern = "XString", subject = "XString"),
+          function(pattern, subject, patternQuality = 22L, subjectQuality = 22L,
                    type = "global", substitutionMatrix = NULL,
                    gapOpening = -10, gapExtension = -4,
                    scoreOnly = FALSE)
-          XString.pairwiseAlignment(string1, string2,
-                                    quality1 = quality1,
-                                    quality2 = quality2,
+          XString.pairwiseAlignment(pattern, subject,
+                                    patternQuality = patternQuality,
+                                    subjectQuality = subjectQuality,
                                     type = type,
                                     substitutionMatrix = substitutionMatrix,
                                     gapExtension = gapExtension,
