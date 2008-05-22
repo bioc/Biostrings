@@ -82,8 +82,8 @@ function(string1,
             function(e1,e2,n) e1 + e2 - (n/(n - 1)) * e1 * e2,
             n = nAlphabet)
     qualityLookupTable <- buildLookupTable(33:(99 + 33), 0:99)
-    qualityMatchMatrix <- log2((1 - errorMatrix) * nAlphabet)
-    qualityMismatchMatrix <- log2(errorMatrix * (nAlphabet / (nAlphabet - 1)))
+    qualityMatchMatrix <- log2((1 - errorMatrix) * nAlphabet) / 2
+    qualityMismatchMatrix <- log2(errorMatrix * (nAlphabet / (nAlphabet - 1))) / 2
 
     constantLookupTable <- integer(0)
     constantMatrix <- matrix(numeric(0), nrow = 0, ncol = 0)
