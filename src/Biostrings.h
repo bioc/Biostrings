@@ -400,6 +400,32 @@ SEXP reduce_IRanges(
 );
 
 
+/* SparseList_utils.c */
+
+SEXP debug_SparseList_utils();
+
+SEXP _SparseList_int2symb(int i);
+
+int _SparseList_symb2int(SEXP symbol);
+
+SEXP _get_val_from_env(
+	SEXP symbol,
+	SEXP env,
+	int error_on_unbound_value
+);
+
+SEXP _get_val_from_SparseList(
+	int i,
+	SEXP env,
+	int error_on_unbound_value
+);
+
+int _get_int_from_SparseList(
+	int i,
+	SEXP env
+);
+
+
 /* XRaw_class.c */
 
 SEXP debug_XRaw_class();
@@ -1121,13 +1147,17 @@ SEXP CWdna_free_actree_nodes_buf();
 SEXP CWdna_pp_STRSXP(
 	SEXP dict,
 	SEXP start,
-	SEXP end
+	SEXP end,
+	SEXP dup2unq_env,
+	SEXP unq2dup_env
 );
 
 SEXP CWdna_pp_XStringSet(
 	SEXP dict,
 	SEXP start,
-	SEXP end
+	SEXP end,
+	SEXP dup2unq_env,
+	SEXP unq2dup_env
 );
 
 
@@ -1169,7 +1199,9 @@ SEXP debug_match_TBdna();
 SEXP XString_match_TBdna(
 	SEXP actree_nodes_xp,
 	SEXP actree_base_codes,
-	SEXP pdict_dups,
+	SEXP pdict_length,
+	SEXP pdict_dup2unq_env,
+	SEXP pdict_unq2dup_env,
 	SEXP pdict_head,
 	SEXP pdict_tail,
 	SEXP subject,
@@ -1182,7 +1214,9 @@ SEXP XString_match_TBdna(
 SEXP XStringViews_match_TBdna(
 	SEXP actree_nodes_xp,
 	SEXP actree_base_codes,
-	SEXP pdict_dups,
+	SEXP pdict_length,
+	SEXP pdict_dup2unq_env,
+	SEXP pdict_unq2dup_env,
 	SEXP pdict_head,
 	SEXP pdict_tail,
 	SEXP subject,
