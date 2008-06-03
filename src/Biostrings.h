@@ -225,7 +225,8 @@ void _IntBuf_set_val(
 
 IntBuf _new_IntBuf(
 	int buflength,
-	int nelt
+	int nelt,
+	int val
 );
 
 void _IntBuf_insert_at(
@@ -411,7 +412,7 @@ SEXP reduce_IRanges(
 
 SEXP debug_SparseList_utils();
 
-SEXP _SparseList_int2symb(int i);
+SEXP _SparseList_int2symb(int symb_as_int);
 
 int _SparseList_symb2int(SEXP symbol);
 
@@ -422,14 +423,24 @@ SEXP _get_val_from_env(
 );
 
 SEXP _get_val_from_SparseList(
-	int i,
+	int symb_as_int,
 	SEXP env,
 	int error_on_unbound_value
 );
 
 int _get_int_from_SparseList(
-	int i,
+	int symb_as_int,
 	SEXP env
+);
+
+void _set_env_from_IntBuf(
+	SEXP env,
+	IntBuf *ibuf
+);
+
+void _set_env_from_IntBBuf(
+	SEXP env,
+	IntBBuf *ibbuf
 );
 
 
@@ -1153,18 +1164,14 @@ SEXP CWdna_free_actree_nodes_buf();
 
 SEXP CWdna_pp_STRSXP(
 	SEXP dict,
-	SEXP start,
-	SEXP end,
-	SEXP dup2unq_env,
-	SEXP unq2dup_env
+	SEXP tb_start,
+	SEXP tb_end
 );
 
 SEXP CWdna_pp_XStringSet(
 	SEXP dict,
-	SEXP start,
-	SEXP end,
-	SEXP dup2unq_env,
-	SEXP unq2dup_env
+	SEXP tb_start,
+	SEXP tb_end
 );
 
 
@@ -1207,8 +1214,7 @@ SEXP XString_match_TBdna(
 	SEXP actree_nodes_xp,
 	SEXP actree_base_codes,
 	SEXP pdict_length,
-	SEXP pdict_dup2unq_env,
-	SEXP pdict_unq2dup_env,
+	SEXP pdict_unq2dup,
 	SEXP pdict_head,
 	SEXP pdict_tail,
 	SEXP subject,
@@ -1222,8 +1228,7 @@ SEXP XStringViews_match_TBdna(
 	SEXP actree_nodes_xp,
 	SEXP actree_base_codes,
 	SEXP pdict_length,
-	SEXP pdict_dup2unq_env,
-	SEXP pdict_unq2dup_env,
+	SEXP pdict_unq2dup,
 	SEXP pdict_head,
 	SEXP pdict_tail,
 	SEXP subject,
