@@ -17,7 +17,7 @@ exportClasses(
     XStringPartialMatches,
     XStringAlign,
     BOC_SubjectString, BOC2_SubjectString,
-    PDict, CWdna_PDict, TBdna_PDict,
+    ACtree, Dups, PDict, CWdna_PDict, TBdna_PDict,
     MIndex, ByPos_MIndex, ByName_MIndex
 )
 
@@ -96,6 +96,7 @@ exportMethods(
     ## Others
     isMatching, mismatch, coverage,
     matchPattern, countPattern,
+    vcountPattern,
     matchLRPatterns,
     matchProbePair,
     findPalindromes,

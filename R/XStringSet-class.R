@@ -147,7 +147,7 @@ setMethod("initialize", "XStringSet",
 
 newXStringSet <- function(class, super, ranges, use.names=FALSE, names=NULL)
 {
-    if (!normalize.use.names(use.names))
+    if (!normargUseNames(use.names))
         names <- NULL
     new(class, super, start(ranges), width(ranges), names)
 }
@@ -228,7 +228,11 @@ setGeneric("XStringSet", signature="x",
 )
 setMethod("XStringSet", "character",
     function(baseClass, x, start=NA, end=NA, width=NA, use.names=TRUE)
+    {
+        if (is.null(baseClass))
+            baseClass <- "BString"
         .charToXStringSet(x, start, end, width, use.names, baseClass)
+    }
 )
 ### Just because of the silly "AsIs" objects found in the probe packages
 ### (e.g. drosophila2probe$sequence)
@@ -414,7 +418,7 @@ setMethod("as.list", "XStringSet",
 setMethod("as.character", "XStringSet",
     function(x, use.names=TRUE)
     {
-        use.names <- normalize.use.names(use.names)
+        use.names <- normargUseNames(use.names)
         ans <- .Call("XStringSet_as_STRSXP",
                      x, dec_lkup(x),
                      PACKAGE="Biostrings")
