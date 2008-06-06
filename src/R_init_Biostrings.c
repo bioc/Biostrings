@@ -114,18 +114,13 @@ static const R_CallMethodDef callMethods[] = {
 /* inject_code.c */
 	{"inject_code", (DL_FUNC) &inject_code, 4},
 
-/* views_buffer.c */
-	{"debug_views_buffer", (DL_FUNC) &debug_views_buffer, 0},
-
-/* normalize_views.c */
-	{"Biostrings_normalize_views", (DL_FUNC) &Biostrings_normalize_views, 2},
-
-/* match_pattern.c */
-	{"debug_match_pattern", (DL_FUNC) &debug_match_pattern, 0},
+/* match_utils.c */
+	{"debug_match_utils", (DL_FUNC) &debug_match_utils, 0},
+	{"nmismatch_at", (DL_FUNC) &nmismatch_at, 5},
 	{"is_matching", (DL_FUNC) &is_matching, 5},
-	{"XString_match_pattern", (DL_FUNC) &XString_match_pattern, 6},
-	{"XStringSet_match_pattern", (DL_FUNC) &XStringSet_match_pattern, 6},
-	{"XStringViews_match_pattern", (DL_FUNC) &XStringViews_match_pattern, 8},
+
+/* match_reporting.c */
+	{"debug_match_reporting", (DL_FUNC) &debug_match_reporting, 0},
 
 /* match_pattern_boyermoore.c */
 	{"debug_match_pattern_boyermoore", (DL_FUNC) &debug_match_pattern_boyermoore, 0},
@@ -133,6 +128,12 @@ static const R_CallMethodDef callMethods[] = {
 /* match_pattern_shiftor.c */
 	{"debug_match_pattern_shiftor", (DL_FUNC) &debug_match_pattern_shiftor, 0},
 	{"bits_per_long", (DL_FUNC) &bits_per_long, 0},
+
+/* match_pattern.c */
+	{"debug_match_pattern", (DL_FUNC) &debug_match_pattern, 0},
+	{"XString_match_pattern", (DL_FUNC) &XString_match_pattern, 6},
+	{"XStringViews_match_pattern", (DL_FUNC) &XStringViews_match_pattern, 8},
+	{"XStringSet_vmatch_pattern", (DL_FUNC) &XStringSet_vmatch_pattern, 6},
 
 /* match_BOC.c */
 	{"debug_match_BOC", (DL_FUNC) &debug_match_BOC, 0},

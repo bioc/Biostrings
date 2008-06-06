@@ -940,56 +940,17 @@ SEXP inject_code(
 );
 
 
-/* views_buffer.c */
+/* match_utils.c */
 
-SEXP debug_views_buffer();
+SEXP debug_match_utils();
 
-void _Biostrings_reset_viewsbuf(int mrmode);
-
-void _init_match_reporting(int mrmode);
-
-void _set_match_shift(int shift);
-
-int _Biostrings_append_view(
-	int start,
-	int end,
-	const char *desc
+SEXP nmismatch_at(
+	SEXP pattern,
+	SEXP subject,
+	SEXP starting,
+	SEXP at,
+	SEXP fixed
 );
-
-int _Biostrings_report_match(
-	int Lpos,
-	int Rpos
-);
-
-int _report_match(
-	int start,
-	int end
-);
-
-SEXP _Biostrings_viewsbuf_count_asINTEGER();
-
-SEXP _Biostrings_viewsbuf_start_asINTEGER();
-
-SEXP _Biostrings_viewsbuf_end_asINTEGER();
-
-SEXP _Biostrings_viewsbuf_desc_asCHARACTER();
-
-SEXP _Biostrings_viewsbuf_asLIST();
-
-SEXP _reported_matches_asSEXP();
-
-
-/* normalize_views.c */
-
-SEXP Biostrings_normalize_views(
-	SEXP start,
-	SEXP end
-);
-
-
-/* match_pattern.c */
-
-SEXP debug_match_pattern();
 
 int _is_matching(
 	RoSeq P,
@@ -1008,34 +969,39 @@ SEXP is_matching(
 	SEXP fixed
 );
 
-SEXP XString_match_pattern(
-	SEXP pattern,
-	SEXP subject,
-	SEXP algorithm,
-	SEXP max_mismatch,
-	SEXP fixed,
-	SEXP count_only
+
+/* match_reporting.c */
+
+SEXP debug_match_reporting();
+
+void _init_match_reporting(int mrmode);
+
+void _drop_current_matches();
+
+void _set_match_shift(int shift);
+
+int _report_view(
+	int start,
+	int end,
+	const char *name
 );
 
-SEXP XStringSet_match_pattern(
-	SEXP pattern,
-	SEXP subject,
-	SEXP algorithm,
-	SEXP max_mismatch,
-	SEXP fixed,
-	SEXP count_only
+int _report_match(
+	int start,
+	int end
 );
 
-SEXP XStringViews_match_pattern(
-	SEXP pattern,
-	SEXP subject,
-	SEXP views_start,
-	SEXP views_width,
-	SEXP algorithm,
-	SEXP max_mismatch,
-	SEXP fixed,
-	SEXP count_only
-);
+SEXP _reported_match_count_asINTEGER();
+
+SEXP _reported_match_starts_asINTEGER();
+
+SEXP _reported_match_ends_asINTEGER();
+
+SEXP _reported_view_names_asCHARACTER();
+
+SEXP _reported_matches_asLIST();
+
+SEXP _reported_matches_asSEXP();
 
 
 /* match_pattern_boyermoore.c */
@@ -1060,6 +1026,40 @@ void _match_pattern_shiftor(
 	int max_mm,
 	int fixedP,
 	int fixedS
+);
+
+
+/* match_pattern.c */
+
+SEXP debug_match_pattern();
+
+SEXP XString_match_pattern(
+	SEXP pattern,
+	SEXP subject,
+	SEXP algorithm,
+	SEXP max_mismatch,
+	SEXP fixed,
+	SEXP count_only
+);
+
+SEXP XStringViews_match_pattern(
+	SEXP pattern,
+	SEXP subject,
+	SEXP views_start,
+	SEXP views_width,
+	SEXP algorithm,
+	SEXP max_mismatch,
+	SEXP fixed,
+	SEXP count_only
+);
+
+SEXP XStringSet_vmatch_pattern(
+	SEXP pattern,
+	SEXP subject,
+	SEXP algorithm,
+	SEXP max_mismatch,
+	SEXP fixed,
+	SEXP count_only
 );
 
 

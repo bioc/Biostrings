@@ -51,10 +51,75 @@ normargFixed <- function(fixed, subjectClass)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### The "nmismatchStartingAt" and "nmismatchEndingAt" generic and methods.
+###
+### 'starting.at' (or 'ending.at') must be integer vectors containing the
+### starting (or ending) positions of the pattern relatively to the subject.
+### The two functions return an integer vector of the same length as
+### 'starting.at' (or 'ending.at').
+###
+
+setGeneric("nmismatchStartingAt", signature="subject",
+    function(pattern, subject, starting.at=1, fixed=TRUE)
+        standardGeneric("nmismatchStartingAt")
+)
+
+setGeneric("nmismatchEndingAt", signature="subject",
+    function(pattern, subject, ending.at=1, fixed=TRUE)
+        standardGeneric("nmismatchEndingAt")
+)
+
+### If 'starting=TRUE' then 'at' contains starting positions, otherwise it
+### contains ending positions.
+.nmismatchAt <- function(pattern, subject, starting, at, fixed)
+{
+    if (!is(subject, "XString"))
+        subject <- XString(NULL, subject)
+    if (class(pattern) != class(subject))
+        pattern <- XString(class(subject), pattern)
+    if (!is.numeric(at)) {
+        what <- if (starting) "starting.at" else "ending.at"
+        stop("'", what, "'  must be a vector of integers")
+    }
+    if (!is.integer(at))
+        at <- as.integer(at)
+    fixed <- normargFixed(fixed, class(subject))
+    .Call("nmismatch_at", pattern, subject,
+          starting, at, fixed,
+          PACKAGE="Biostrings")
+}
+
+### Dispatch on 'subject' (see signature of generic).
+setMethod("nmismatchStartingAt", "character",
+    function(pattern, subject, starting.at=1, fixed=TRUE)
+        .nmismatchAt(pattern, subject, TRUE, starting.at, fixed)
+)
+setMethod("nmismatchEndingAt", "character",
+    function(pattern, subject, ending.at=1, fixed=TRUE)
+        .nmismatchAt(pattern, subject, FALSE, ending.at, fixed)
+)
+
+### Dispatch on 'subject' (see signature of generic).
+setMethod("nmismatchStartingAt", "XString",
+    function(pattern, subject, starting.at=1, fixed=TRUE)
+        .nmismatchAt(pattern, subject, TRUE, starting.at, fixed)
+)
+setMethod("nmismatchEndingAt", "XString",
+    function(pattern, subject, ending.at=1, fixed=TRUE)
+        .nmismatchAt(pattern, subject, FALSE, ending.at, fixed)
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### The "isMatching" generic and methods.
 ###
 ### Return a logical vector of the same length as 'start'.
 ###
+
+setGeneric("isMatching", signature="subject",
+    function(pattern, subject, start=1, max.mismatch=0, fixed=TRUE)
+        standardGeneric("isMatching")
+)
 
 .isMatching <- function(pattern, subject, start, max.mismatch, fixed)
 {
@@ -73,25 +138,16 @@ normargFixed <- function(fixed, subjectClass)
           PACKAGE="Biostrings")
 }
 
-setGeneric("isMatching", signature="subject",
-    function(pattern, subject, start=1, max.mismatch=0, fixed=TRUE)
-        standardGeneric("isMatching")
-)
-
 ### Dispatch on 'subject' (see signature of generic).
 setMethod("isMatching", "character",
     function(pattern, subject, start=1, max.mismatch=0, fixed=TRUE)
-    {
         .isMatching(pattern, subject, start, max.mismatch, fixed)
-    }
 )
 
 ### Dispatch on 'subject' (see signature of generic).
 setMethod("isMatching", "XString",
     function(pattern, subject, start=1, max.mismatch=0, fixed=TRUE)
-    {
         .isMatching(pattern, subject, start, max.mismatch, fixed)
-    }
 )
 
 

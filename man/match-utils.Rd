@@ -2,11 +2,20 @@
 
 \alias{match-utils}
 
+\alias{nmismatchStartingAt}
+\alias{nmismatchEndingAt}
+\alias{nmismatchStartingAt,character-method}
+\alias{nmismatchEndingAt,character-method}
+\alias{nmismatchStartingAt,XString-method}
+\alias{nmismatchEndingAt,XString-method}
+
 \alias{isMatching}
 \alias{isMatching,character-method}
 \alias{isMatching,XString-method}
+
 \alias{mismatch}
 \alias{mismatch,XStringViews-method}
+
 \alias{coverage}
 \alias{coverage,IRanges-method}
 \alias{coverage,MaskCollection-method}
@@ -22,7 +31,8 @@
   ("exact match" or "inexact match") as understood by the various pattern
   matching functions available in the Biostrings package.
 
-  The \code{isMatching} function implements this concept.
+  The \code{nmismatchStartingAt}, \code{nmismatchEndingAt} and \code{isMatching}
+  functions implement this concept.
 
   Other utility functions related to pattern matching are described here:
   the \code{mismatch} function for getting the positions of the mismatching
@@ -32,6 +42,8 @@
 }
 
 \usage{
+  nmismatchStartingAt(pattern, subject, starting.at=1, fixed=TRUE)
+  nmismatchEndingAt(pattern, subject, ending.at=1, fixed=TRUE)
   isMatching(pattern, subject, start=1, max.mismatch=0, fixed=TRUE)
   mismatch(pattern, x, fixed=TRUE)
   coverage(x, start=NA, end=NA)
@@ -42,11 +54,20 @@
     The pattern string.
   }
   \item{subject}{
-    An \link{XString} object containing the subject sequence,
+    An \link{XString} object (or character vector) containing the subject
+    sequence,
+  }
+  \item{starting.at}{
+    An integer vector specifying the starting positions of the pattern
+    relatively to the subject.
+  }
+  \item{ending.at}{
+    An integer vector specifying the ending positions of the pattern
+    relatively to the subject.
   }
   \item{start}{
-    For \code{isMatching}: an integer vector specifying where to place the
-    pattern relatively to the subject.
+    For \code{isMatching}: an integer vector specifying the starting positions
+    of the pattern relatively to the subject.
     For \code{coverage}: a single integer specifying the position in \code{x}
     where to start the extraction of the coverage.
   }
@@ -91,6 +112,10 @@
 }
 
 \value{
+  \code{nmismatchStartingAt}, \code{nmismatchEndingAt}: an integer vector of
+  the same length as \code{starting.at} (or \code{ending.at}) reporting the
+  number of mismatching letters for each starting (or ending) position.
+
   A logical vector of the same length as \code{start} for \code{isMatching}.
 
   A list of integer vectors for \code{mismatch}.
@@ -124,26 +149,40 @@
 
 \examples{
   ## ---------------------------------------------------------------------
-  ## isMatching()
+  ## nmismatchStartingAt() / isMatching()
   ## ---------------------------------------------------------------------
   subject <- DNAString("GTATA")
-  ## Pattern "AT" matches subject "GTATA" at position 3
+
+  ## Pattern "AT" matches subject "GTATA" at position 3 (exact match)
+  nmismatchStartingAt("AT", subject, starting.at=3)
   isMatching("AT", subject, start=3)
-  ## No match at position 1
+
+  ## ... but not at position 1
+  nmismatchStartingAt("AT", subject)
   isMatching("AT", subject)
-  ## Match at position 1 if we allow 1 mismatching letter
+
+  ## ... unless we allow 1 mismatching letter (inexact match)
   isMatching("AT", subject, max.mismatch=1)
-  ## 3 matches in total if we allow 1 mismatching letter
+
+  ## Here we look at 6 different starting positions and find 3 matches if
+  ## we allow 1 mismatching letter
   isMatching("AT", subject, start=0:5, max.mismatch=1)
+
   ## No match
+  nmismatchStartingAt("NT", subject, starting.at=1:4)
   isMatching("NT", subject, start=1:4)
+
   ## 2 matches if N is interpreted as an ambiguity (fixed=FALSE)
+  nmismatchStartingAt("NT", subject, starting.at=1:4, fixed=FALSE)
   isMatching("NT", subject, start=1:4, fixed=FALSE)
+
   ## max.mismatch != 0 and fixed=FALSE can be used together
+  nmismatchStartingAt("NCA", subject, starting.at=0:5, fixed=FALSE)
   isMatching("NCA", subject, start=0:5, max.mismatch=1, fixed=FALSE)
 
   some_starts <- c(10:-10, NA, 6)
-  is_matching <- isMatching("CAT", DNAString("ACGTGCA"), start=some_starts, max.mismatch=1)
+  subject <- DNAString("ACGTGCA")
+  is_matching <- isMatching("CAT", subject, start=some_starts, max.mismatch=1)
   some_starts[is_matching]
 
   ## ---------------------------------------------------------------------
@@ -176,4 +215,3 @@
 }
 
 \keyword{methods}
-
