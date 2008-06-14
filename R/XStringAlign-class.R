@@ -34,10 +34,10 @@ setMethod("initialize", "XStringAlign",
         if (length(type) != 1 || !(type %in% c("global", "local", "overlap")))
             stop("'type' must be one of 'global', 'local', or 'overlap'")
         gapOpening <- as.double(- abs(gapOpening))
-        if (is.na(gapOpening) || length(gapOpening) != 1)
+        if (length(gapOpening) != 1 || is.na(gapOpening))
             stop("'gapOpening' must be a non-positive numeric vector of length 1")
         gapExtension <- as.double(- abs(gapExtension))
-        if (is.na(gapExtension) || length(gapExtension) != 1)
+        if (length(gapExtension) != 1 || is.na(gapExtension))
             stop("'gapExtension' must be a non-positive numeric vector of length 1")
 		.Object@align1 <- align1
         .Object@align2 <- align2

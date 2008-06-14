@@ -146,19 +146,25 @@ static float pairwiseAlignment(
 				S_TRACE_MATRIX(iMinus1, jMinus1) = DELETION;
 				F_MATRIX(i, j) = SAFE_SUM(H_MATRIX(iMinus1, jMinus1), substitutionValue);
 			}
-			if (SAFE_SUM(F_MATRIX(iMinus1, j), gapOpening) >= H_MATRIX(iMinus1, j)) {
+			if ((SAFE_SUM(F_MATRIX(iMinus1, j), gapOpening) >= H_MATRIX(iMinus1, j)) &&
+				(F_MATRIX(iMinus1, j) >= V_MATRIX(iMinus1, j))) {
 				D_TRACE_MATRIX(iMinus1, jMinus1) = SUBSTITUTION;
 				H_MATRIX(i, j) = SAFE_SUM(F_MATRIX(iMinus1, j), gapOpeningPlusExtension);
 			} else {
 				D_TRACE_MATRIX(iMinus1, jMinus1) = DELETION;
-				H_MATRIX(i, j) = SAFE_SUM(H_MATRIX(iMinus1, j), gapExtension);
+				H_MATRIX(i, j) =
+					MAX(SAFE_SUM(H_MATRIX(iMinus1, j), gapExtension),
+						SAFE_SUM(V_MATRIX(iMinus1, j), gapOpeningPlusExtension));
 			}
-			if (SAFE_SUM(F_MATRIX(i, jMinus1), gapOpening) >= V_MATRIX(i, jMinus1)) {
+			if ((SAFE_SUM(F_MATRIX(i, jMinus1), gapOpening) >= V_MATRIX(i, jMinus1)) &&
+				(F_MATRIX(i, jMinus1) >= H_MATRIX(i, jMinus1))) {
 				I_TRACE_MATRIX(iMinus1, jMinus1) = SUBSTITUTION;
 				V_MATRIX(i, j) = SAFE_SUM(F_MATRIX(i, jMinus1), gapOpeningPlusExtension);
 			} else {
 				I_TRACE_MATRIX(iMinus1, jMinus1) = INSERTION;
-				V_MATRIX(i, j) = SAFE_SUM(V_MATRIX(i, jMinus1), gapExtension);
+				V_MATRIX(i, j) =
+					MAX(SAFE_SUM(V_MATRIX(i, jMinus1), gapExtension),
+						SAFE_SUM(H_MATRIX(i, jMinus1), gapOpeningPlusExtension));
 			}
 
 			if (typeCode == LOCAL_ALIGNMENT) {
