@@ -132,78 +132,6 @@ void _get_RoSeqs_order(
 );
 
 
-/* Dups_utils.c */
-
-SEXP debug_Dups_utils();
-
-SEXP Dups_diff(
-	SEXP x_unq2dup,
-	SEXP y_dup2unq
-);
-
-void _init_dup2unq_buf(int length);
-
-void _report_dup(
-	int poffset,
-	int P_id
-);
-
-SEXP _dup2unq_asINTEGER();
-
-
-/* SparseList_utils.c */
-
-SEXP debug_SparseList_utils();
-
-SEXP _SparseList_int2symb(int symb_as_int);
-
-int _SparseList_symb2int(SEXP symbol);
-
-SEXP _get_val_from_env(
-	SEXP symbol,
-	SEXP env,
-	int error_on_unbound_value
-);
-
-SEXP _get_val_from_SparseList(
-	int symb_as_int,
-	SEXP env,
-	int error_on_unbound_value
-);
-
-int _get_int_from_SparseList(
-	int symb_as_int,
-	SEXP env
-);
-
-void _set_env_from_IntAE(
-	SEXP env,
-	const IntAE *int_ae
-);
-
-void _set_env_from_IntAEAE(
-	SEXP env,
-	const IntAEAE *int_aeae
-);
-
-
-/* fasta_io.c */
-
-SEXP debug_fasta_io();
-
-SEXP fasta_info(
-	SEXP filepath,
-	SEXP use_descs
-);
-
-SEXP RawPtr_loadFASTA(
-	SEXP rawptr_xp,
-	SEXP filepath,
-	SEXP collapse,
-	SEXP lkup
-);
-
-
 /* XString_class.c */
 
 SEXP debug_XString_class();
@@ -326,6 +254,23 @@ SEXP XStringSet_as_STRSXP(
 SEXP XStringSet_order(SEXP x);
 
 
+/* fasta_io.c */
+
+SEXP debug_fasta_io();
+
+SEXP fasta_info(
+	SEXP filepath,
+	SEXP use_descs
+);
+
+SEXP RawPtr_loadFASTA(
+	SEXP rawptr_xp,
+	SEXP filepath,
+	SEXP collapse,
+	SEXP lkup
+);
+
+
 /* char_frequency.c */
 
 SEXP XString_char_frequency(
@@ -393,6 +338,156 @@ SEXP inject_code(
 );
 
 
+/* SparseList_utils.c */
+
+SEXP debug_SparseList_utils();
+
+SEXP _SparseList_int2symb(int symb_as_int);
+
+int _SparseList_symb2int(SEXP symbol);
+
+SEXP _get_val_from_env(
+	SEXP symbol,
+	SEXP env,
+	int error_on_unbound_value
+);
+
+SEXP _get_val_from_SparseList(
+	int symb_as_int,
+	SEXP env,
+	int error_on_unbound_value
+);
+
+int _get_int_from_SparseList(
+	int symb_as_int,
+	SEXP env
+);
+
+void _set_env_from_IntAE(
+	SEXP env,
+	const IntAE *int_ae
+);
+
+void _set_env_from_IntAEAE(
+	SEXP env,
+	const IntAEAE *int_aeae
+);
+
+
+/* Dups_utils.c */
+
+SEXP debug_Dups_utils();
+
+SEXP Dups_diff(
+	SEXP x_unq2dup,
+	SEXP y_dup2unq
+);
+
+void _init_dup2unq_buf(int length);
+
+void _report_dup(
+	int poffset,
+	int P_id
+);
+
+SEXP _dup2unq_asINTEGER();
+
+
+/* match_reporting.c */
+
+SEXP debug_match_reporting();
+
+void _init_match_reporting(int mrmode);
+
+void _drop_current_matches();
+
+void _set_match_shift(int shift);
+
+int _report_view(
+	int start,
+	int end,
+	const char *name
+);
+
+int _report_match(
+	int start,
+	int end
+);
+
+SEXP _reported_match_count_asINTEGER();
+
+SEXP _reported_match_starts_asINTEGER();
+
+SEXP _reported_match_ends_asINTEGER();
+
+SEXP _reported_view_names_asCHARACTER();
+
+SEXP _reported_matches_asLIST();
+
+SEXP _reported_matches_asSEXP();
+
+
+/* MIndex_utils.c */
+
+SEXP debug_MIndex_utils();
+
+void _MIndex_init_match_reporting(
+	int is_count_only,
+	int with_headtail,
+	int pdict_L
+);
+
+int _MIndex_get_match_reporting_mode();
+
+IntAE *_MIndex_get_match_count();
+
+IntAE *_MIndex_get_match_ends(int key);
+
+IntAE *_MIndex_get_matching_keys();
+
+void _MIndex_report_match(
+	int key,
+	int end
+);
+
+void _MIndex_merge_matches(
+	IntAE *global_match_count,
+	const IntAEAE *global_match_ends,
+	int view_offset
+);
+
+SEXP _MIndex_reported_matches_asSEXP(SEXP env);
+
+SEXP ByPos_MIndex_endIndex(
+	SEXP x_dup2unq,
+	SEXP x_ends,
+	SEXP shift
+);
+
+SEXP ByName_MIndex_endIndex(
+	SEXP ends_envir,
+	SEXP shift,
+	SEXP names,
+	SEXP all_names
+);
+
+void ByPos_MIndex_coverage(
+	SEXP ends_list,
+	SEXP mindex_width,
+	SEXP start,
+	SEXP ans_xp
+);
+
+void ByName_MIndex_coverage(
+	SEXP ends_envir,
+	SEXP mindex_width,
+	SEXP start,
+	SEXP ans_xp
+);
+
+SEXP ByPos_MIndex_combine(SEXP ends_listlist);
+
+
 /* match_utils.c */
 
 SEXP debug_match_utils();
@@ -431,40 +526,6 @@ SEXP nmatch_PairwiseAlignment(
 	SEXP ninsertion,
 	SEXP ndeletion
 );
-
-
-/* match_reporting.c */
-
-SEXP debug_match_reporting();
-
-void _init_match_reporting(int mrmode);
-
-void _drop_current_matches();
-
-void _set_match_shift(int shift);
-
-int _report_view(
-	int start,
-	int end,
-	const char *name
-);
-
-int _report_match(
-	int start,
-	int end
-);
-
-SEXP _reported_match_count_asINTEGER();
-
-SEXP _reported_match_starts_asINTEGER();
-
-SEXP _reported_match_ends_asINTEGER();
-
-SEXP _reported_view_names_asCHARACTER();
-
-SEXP _reported_matches_asLIST();
-
-SEXP _reported_matches_asSEXP();
 
 
 /* match_pattern_boyermoore.c */
@@ -628,67 +689,6 @@ SEXP find_palindromes(
 );
 
 
-/* MIndex_utils.c */
-
-SEXP debug_MIndex_utils();
-
-void _MIndex_init_match_reporting(
-	int is_count_only,
-	int with_headtail,
-	int pdict_L
-);
-
-int _MIndex_get_match_reporting_mode();
-
-IntAE *_MIndex_get_match_count();
-
-IntAE *_MIndex_get_match_ends(int key);
-
-IntAE *_MIndex_get_matching_keys();
-
-void _MIndex_report_match(
-	int key,
-	int end
-);
-
-void _MIndex_merge_matches(
-	IntAE *global_match_count,
-	const IntAEAE *global_match_ends,
-	int view_offset
-);
-
-SEXP _MIndex_reported_matches_asSEXP(SEXP env);
-
-SEXP ByPos_MIndex_endIndex(
-	SEXP x_dup2unq,
-	SEXP x_ends,
-	SEXP shift
-);
-
-SEXP ByName_MIndex_endIndex(
-	SEXP ends_envir,
-	SEXP shift,
-	SEXP names,
-	SEXP all_names
-);
-
-void ByPos_MIndex_coverage(
-	SEXP ends_list,
-	SEXP mindex_width,
-	SEXP start,
-	SEXP ans_xp
-);
-
-void ByName_MIndex_coverage(
-	SEXP ends_envir,
-	SEXP mindex_width,
-	SEXP start,
-	SEXP ans_xp
-);
-
-SEXP ByPos_MIndex_combine(SEXP ends_listlist);
-
-
 /* match_pdict_Twobit.c */
 
 SEXP debug_match_pdict_Twobit();
@@ -762,6 +762,30 @@ SEXP XStringViews_match_pdict(
 );
 
 
+/* align_utils.c */
+
+SEXP AlignedXStringSet_nchar(SEXP alignedXStringSet);
+
+SEXP AlignedXStringSet_align_aligned(
+	SEXP alignedXStringSet,
+	SEXP gapCode
+);
+
+SEXP PairwiseAlignment_align_aligned(
+	SEXP alignment,
+	SEXP gapCode
+);
+
+SEXP align_compareStrings(
+	SEXP patternStrings,
+	SEXP subjectStrings,
+	SEXP maxNChar,
+	SEXP insertionCode,
+	SEXP deletionCode,
+	SEXP mismatchCode
+);
+
+
 /* pmatchPattern.c */
 
 SEXP lcprefix(
@@ -780,19 +804,6 @@ SEXP lcsuffix(
 	SEXP s2_xp,
 	SEXP s2_offset,
 	SEXP s2_length
-);
-
-
-/* align_needwunsQS.c */
-
-SEXP align_needwunsQS(
-	SEXP s1,
-	SEXP s2,
-	SEXP mat,
-	SEXP mat_nrow,
-	SEXP lkup,
-	SEXP gap_cost,
-	SEXP gap_code
 );
 
 
@@ -831,10 +842,15 @@ SEXP XStringSet_align_distance(
 );
 
 
-/* align_utils.c */
+/* align_needwunsQS.c */
 
-SEXP AlignedXStringSet_nchar(SEXP alignedXStringSet);
-SEXP AlignedXStringSet_align_aligned(SEXP alignedXStringSet, SEXP gapCode);
-SEXP PairwiseAlignment_align_aligned(SEXP alignment, SEXP gapCode);
-SEXP align_compareStrings(SEXP patternStrings, SEXP subjectStrings, SEXP maxNChar,
-                          SEXP insertionCode, SEXP deletionCode, SEXP mismatchCode);
+SEXP align_needwunsQS(
+	SEXP s1,
+	SEXP s2,
+	SEXP mat,
+	SEXP mat_nrow,
+	SEXP lkup,
+	SEXP gap_cost,
+	SEXP gap_code
+);
+

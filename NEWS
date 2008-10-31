@@ -1,8 +1,8 @@
 **************************************************
-*              2.9 SERIES NEWS                   *
+*              2.10 SERIES NEWS                  *
 **************************************************
 
-CONTAINERS
+BASIC CONTAINERS
 
 o Added a set of "coerce" methods for turning an arbitrary XStringSet object
   into a BStringSet, DNAStringSet, RNAStringSet or AAStringSet instance (via
@@ -46,6 +46,11 @@ o Moved the generic functions for width(), shift(), restrict(), narrow(),
   subviews() to new IRanges package.
 
 STRING MATCHING
+
+o Added the vmatchPattern() and vcountPattern() generic functions with
+  methods for XStringSet objects. They are the vectorized versions of
+  matchPattern()/countPattern() i.e. the subject must be an XStringSet
+  object (support for XStringViews objects will follow soon).
 
 o Addition of the 'dups0' slot to the ByPos_MIndex class: this allows a more
   compact representation in memory of a ByPos_MIndex object that holds the
@@ -112,7 +117,7 @@ MISCELLANEOUS
 *	       2.8 SERIES NEWS			 *
 **************************************************
 
-CONTAINERS
+BASIC CONTAINERS
 
 o Added 2 containers for handling masked sequences:
     - The MaskCollection container for storing a collection of masks that can
