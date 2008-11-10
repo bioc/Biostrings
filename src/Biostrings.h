@@ -3,57 +3,6 @@
 
 #define DEBUG_BIOSTRINGS 1
 
-#define CHRTRTABLE_LENGTH 256
-
-typedef int CharToIntTable[CHRTRTABLE_LENGTH];
-
-
-/* copy_seq.c */
-
-SEXP debug_copy_seq();
-
-void _copy_seq(
-	char *dest,
-	const char *src,
-	size_t n,
-	const int *chrtrtable
-);
-
-void _revcopy_seq(
-	char *dest,
-	const char *src,
-	size_t n,
-	const int *chrtrtable
-);
-
-void _copy_seq_from_i1i2(
-	int i1, int i2,
-	char *dest, int dest_length,
-	const char *src, int src_length,
-	const int *chrtrtable
-);
-
-void _copy_seq_to_i1i2(
-	int i1, int i2,
-	char *dest, int dest_length,
-	const char *src, int src_length,
-	const int *chrtrtable
-);
-
-void _copy_seq_from_subset(
-	const int *subset, int n,
-	char *dest, int dest_length,
-	const char *src, int src_length,
-	const int *chrtrtable
-);
-
-void _copy_seq_to_subset(
-	const int *subset, int n,
-	char *dest, int dest_length,
-	const char *src, int src_length,
-	const int *chrtrtable
-);
-
 
 /* utils.c */
 
@@ -65,10 +14,70 @@ int fgets_rtrimmed(
 	FILE *stream
 );
 
-void _init_chrtrtable(
-	const int *codes,
-	int len,
-	int *chrtrtable
+void _init_ByteTrTable_with_lkup(
+	ByteTrTable byte2code,
+	SEXP lkup
+);
+
+SEXP _new_lkup_from_ByteTrTable(const ByteTrTable *byte2code);
+
+void _init_byte2offset_with_INTEGER(
+	ByteTrTable byte2offset,
+	SEXP bytes,
+	int error_on_dup
+);
+
+void _init_byte2offset_with_RoSeq(
+	ByteTrTable byte2offset,
+	const RoSeq *seq,
+	int error_on_dup
+);
+
+
+/* copy_seq.c */
+
+SEXP debug_copy_seq();
+
+void _copy_seq(
+	char *dest,
+	const char *src,
+	size_t n,
+	const ByteTrTable *byte2code
+);
+
+void _revcopy_seq(
+	char *dest,
+	const char *src,
+	size_t n,
+	const ByteTrTable *byte2code
+);
+
+void _copy_seq_from_i1i2(
+	int i1, int i2,
+	char *dest, int dest_length,
+	const char *src, int src_length,
+	const ByteTrTable *byte2code
+);
+
+void _copy_seq_to_i1i2(
+	int i1, int i2,
+	char *dest, int dest_length,
+	const char *src, int src_length,
+	const ByteTrTable *byte2code
+);
+
+void _copy_seq_from_subset(
+	const int *subset, int n,
+	char *dest, int dest_length,
+	const char *src, int src_length,
+	const ByteTrTable *byte2code
+);
+
+void _copy_seq_to_subset(
+	const int *subset, int n,
+	char *dest, int dest_length,
+	const char *src, int src_length,
+	const ByteTrTable *byte2code
 );
 
 
@@ -123,7 +132,7 @@ void _write_RoSeq_to_RawPtr(
 	SEXP x,
 	int offset,
 	const RoSeq *seq,
-	const int *chrtrtable
+	const ByteTrTable *byte2code
 );
 
 void _get_RoSeqs_order(
@@ -136,9 +145,9 @@ void _get_RoSeqs_order(
 
 SEXP debug_XString_class();
 
-const int *get_enc_chrtrtable(const char *classname);
+const ByteTrTable *get_enc_byte2code(const char *classname);
 
-const int *get_dec_chrtrtable(const char *classname);
+const ByteTrTable *get_dec_byte2code(const char *classname);
 
 SEXP init_DNAlkups(SEXP enc_lkup, SEXP dec_lkup);
 
@@ -397,32 +406,13 @@ SEXP _dup2unq_asINTEGER();
 
 SEXP debug_match_reporting();
 
-void _init_match_reporting(int mrmode);
+void _init_match_reporting(SEXP mode);
 
-void _drop_current_matches();
+void _drop_reported_matches();
 
-void _set_match_shift(int shift);
+void _shift_match_on_reporting(int shift);
 
-int _report_view(
-	int start,
-	int end,
-	const char *name
-);
-
-int _report_match(
-	int start,
-	int end
-);
-
-SEXP _reported_match_count_asINTEGER();
-
-SEXP _reported_match_starts_asINTEGER();
-
-SEXP _reported_match_ends_asINTEGER();
-
-SEXP _reported_view_names_asCHARACTER();
-
-SEXP _reported_matches_asLIST();
+void _report_match(int start, int width);
 
 SEXP _reported_matches_asSEXP();
 
@@ -488,9 +478,9 @@ void ByName_MIndex_coverage(
 SEXP ByPos_MIndex_combine(SEXP ends_listlist);
 
 
-/* match_utils.c */
+/* match_pattern_at.c */
 
-SEXP debug_match_utils();
+SEXP debug_match_pattern_at();
 
 int (*_selected_nmismatch_at_Pshift_fun)(
 	const RoSeq *P,
@@ -504,27 +494,33 @@ void _select_nmismatch_at_Pshift_fun(
 	int fixedS
 );
 
-SEXP nmismatch_at(
+int _nedit_for_Ploffset(
+	const RoSeq *P,
+	const RoSeq *S,
+	int Ploffset,
+	int max_nedit,
+	int loose_Ploffset,
+	int *min_width
+);
+
+int _nedit_for_Proffset(
+	const RoSeq *P,
+	const RoSeq *S,
+	int Proffset,
+	int max_nedit,
+	int loose_Proffset,
+	int *min_width
+);
+
+SEXP match_pattern_at(
 	SEXP pattern,
 	SEXP subject,
-	SEXP starting,
 	SEXP at,
-	SEXP fixed
-);
-
-SEXP is_matching(
-	SEXP pattern,
-	SEXP subject,
-	SEXP start,
+	SEXP at_type,
 	SEXP max_mismatch,
-	SEXP fixed
-);
-
-SEXP nmatch_PairwiseAlignment(
-	SEXP nchar,
-	SEXP nmismatch,
-	SEXP ninsertion,
-	SEXP ndeletion
+	SEXP with_indels,
+	SEXP fixed,
+	SEXP ans_type
 );
 
 
@@ -553,6 +549,19 @@ void _match_pattern_shiftor(
 );
 
 
+/* match_pattern_indels.c */
+
+SEXP debug_match_pattern_indels();
+
+void _match_pattern_indels(
+	const RoSeq *P,
+	const RoSeq *S,
+	int max_mm,
+	int fixedP,
+	int fixedS
+);
+
+
 /* match_pattern.c */
 
 SEXP debug_match_pattern();
@@ -562,6 +571,7 @@ SEXP XString_match_pattern(
 	SEXP subject,
 	SEXP algorithm,
 	SEXP max_mismatch,
+	SEXP with_indels,
 	SEXP fixed,
 	SEXP count_only
 );
@@ -573,6 +583,7 @@ SEXP XStringViews_match_pattern(
 	SEXP views_width,
 	SEXP algorithm,
 	SEXP max_mismatch,
+	SEXP with_indels,
 	SEXP fixed,
 	SEXP count_only
 );
@@ -582,6 +593,7 @@ SEXP XStringSet_vmatch_pattern(
 	SEXP subject,
 	SEXP algorithm,
 	SEXP max_mismatch,
+	SEXP with_indels,
 	SEXP fixed,
 	SEXP count_only
 );
@@ -763,6 +775,13 @@ SEXP XStringViews_match_pdict(
 
 
 /* align_utils.c */
+
+SEXP PairwiseAlignment_nmatch(
+	SEXP nchar,
+	SEXP nmismatch,
+	SEXP ninsertion,
+	SEXP ndeletion
+);
 
 SEXP AlignedXStringSet_nchar(SEXP alignedXStringSet);
 

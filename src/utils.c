@@ -46,30 +46,125 @@ int fgets_rtrimmed(char *s, int size, FILE *stream)
 	return line_len;
 }
 
-/*
- * Values in 'codes' must represent byte values i.e. values >= 0 and < 256.
- * Output is written to 'chrtrtable' which must be a writable int array of
- * length CHRTRTABLE_LENGTH (256).
- */
-void _init_chrtrtable(const int *codes, int len, int *chrtrtable)
+#ifdef DEBUG_BIOSTRINGS
+void print_ByteTrTable(const ByteTrTable byte2code)
 {
-	int code, *offset_p, offset;
+	int byte, code;
 
-	for (code = 0, offset_p = chrtrtable;
-	     code < CHRTRTABLE_LENGTH;
-	     code++, offset_p++)
-		*offset_p = -1;
-	for (offset = 0; offset < len; offset++, codes++) {
-		code = *codes;
-		if (code < 0 || code >= CHRTRTABLE_LENGTH)
-			error("Biostrings internal error in _init_chrtrtable(): "
-			      "invalid code %d", code);
-		chrtrtable[(unsigned char) code] = offset;
+	Rprintf("[DEBUG]   Byte Translation Table:\n");
+	for (byte = 0; byte < BYTETRTABLE_LENGTH; byte++) {
+		Rprintf("[DEBUG]     byte=%d ", byte);
+		if (32 <= byte && byte < 128)
+			Rprintf("['%c']", byte);
+		else
+			Rprintf("     ");
+		Rprintf(" -> code=");
+		code = byte2code[byte];
+		if (code == NA_INTEGER)
+			Rprintf("NA\n");
+		else
+			Rprintf("%d\n", code);
+	}
+	return;
+}
+#endif
+
+void _init_ByteTrTable_with_lkup(ByteTrTable byte2code, SEXP lkup)
+{
+	int byte;
+
+	if (LENGTH(lkup) > BYTETRTABLE_LENGTH)
+		error("Biostrings internal error in _init_ByteTrTable_with_lkup(): "
+		      "LENGTH(lkup) > BYTETRTABLE_LENGTH");
+	for (byte = 0; byte < LENGTH(lkup); byte++)
+		byte2code[byte] = INTEGER(lkup)[byte];
+	for ( ; byte < BYTETRTABLE_LENGTH; byte++)
+		byte2code[byte] = NA_INTEGER;
+#ifdef DEBUG_BIOSTRINGS
+	if (debug) {
+		Rprintf("[DEBUG] _init_ByteTrTable_with_lkup():\n");
+		print_ByteTrTable(byte2code);
+	}
+#endif
+	return;
+}
+
+SEXP _new_lkup_from_ByteTrTable(const ByteTrTable *byte2code)
+{
+	SEXP ans;
+	int byte;
+
+	if (byte2code == NULL)
+		return R_NilValue;
+	PROTECT(ans = NEW_INTEGER(BYTETRTABLE_LENGTH));
+	for (byte = 0; byte < BYTETRTABLE_LENGTH; byte++)
+		INTEGER(ans)[byte] = (*byte2code)[byte];
+	UNPROTECT(1);
+	return ans;
+}
+
+static void set_byte2offset_elt(ByteTrTable byte2offset,
+		int byte, int offset, int error_on_dup)
+{
+	int *offset_p;
+
+	if (byte < 0 || byte >= BYTETRTABLE_LENGTH)
+		error("Biostrings internal error in set_byte2offset_elt(): "
+		      "invalid byte value %d", byte);
+	offset_p = byte2offset + (unsigned char) byte;
+	if (*offset_p == NA_INTEGER) {
+		*offset_p = offset;
+		return;
+	}
+	if (error_on_dup)
+		error("Biostrings internal error in set_byte2offset_elt(): "
+		      "duplicated byte value %d", byte);
+	return;
+}
+
+/*
+ * Values in 'bytes' must represent byte values i.e. values >= 0 and < 256.
+ * The byte offsets are written to 'byte2offset'.
+*/
+void _init_byte2offset_with_INTEGER(ByteTrTable byte2offset, SEXP bytes, int error_on_dup)
+{
+	int byte, offset;
+
+	if (LENGTH(bytes) > BYTETRTABLE_LENGTH)
+		error("Biostrings internal error in _init_byte2offset_with_INTEGER(): ",
+		      "LENGTH(bytes) > BYTETRTABLE_LENGTH");
+	for (byte = 0; byte < BYTETRTABLE_LENGTH; byte++)
+		byte2offset[byte] = NA_INTEGER;
+	for (offset = 0; offset < LENGTH(bytes); offset++) {
+		byte = INTEGER(bytes)[offset];
+		set_byte2offset_elt(byte2offset, byte, offset, error_on_dup);
 	}
 #ifdef DEBUG_BIOSTRINGS
 	if (debug) {
-		for (code = 0, offset_p = chrtrtable; code < CHRTRTABLE_LENGTH; code++, offset_p++)
-			Rprintf("[DEBUG] _init_chrtrtable(): code=%d offset=%d\n", code, *offset_p);
+		Rprintf("[DEBUG] _init_byte2offset_with_INTEGER():\n");
+		print_ByteTrTable(byte2offset);
+	}
+#endif
+	return;
+}
+
+void _init_byte2offset_with_RoSeq(ByteTrTable byte2offset, const RoSeq *seq, int error_on_dup)
+{
+	int byte, offset;
+
+	if (seq->nelt > BYTETRTABLE_LENGTH)
+		error("Biostrings internal error in _init_byte2offset_with_RoSeq(): ",
+		      "seq->nelt > BYTETRTABLE_LENGTH");
+	for (byte = 0; byte < BYTETRTABLE_LENGTH; byte++)
+		byte2offset[byte] = NA_INTEGER;
+	for (offset = 0; offset < seq->nelt; offset++) {
+		byte = seq->elts[offset];
+		set_byte2offset_elt(byte2offset, byte, offset, error_on_dup);
+	}
+#ifdef DEBUG_BIOSTRINGS
+	if (debug) {
+		Rprintf("[DEBUG] _init_byte2offset_with_RoSeq():\n");
+		print_ByteTrTable(byte2offset);
 	}
 #endif
 	return;

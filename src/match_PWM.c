@@ -7,20 +7,20 @@
 /*
  * Table used for fast look up between A, C, G, T internal codes and the
  * corresponding 0-based row indice (the row offset) in the PWM:
- *   A internal code     ->  0
- *   C internal code     ->  1
- *   G internal code     ->  2
- *   T internal code     ->  3
- *   other internal code -> -1
+ *   A internal code     -> 0
+ *   C internal code     -> 1
+ *   G internal code     -> 2
+ *   T internal code     -> 3
+ *   other internal code -> NA_INTEGER
  */
-static int DNAcode2PWMrowoffset[256];
+static ByteTrTable DNAcode2PWMrowoffset;
 
 static void init_DNAcode2PWMrowoffset()
 {
 	int i;
 
-	for (i = 0; i < 256; i++)
-		DNAcode2PWMrowoffset[i] = -1;
+	for (i = 0; i < BYTETRTABLE_LENGTH; i++)
+		DNAcode2PWMrowoffset[i] = NA_INTEGER;
 	DNAcode2PWMrowoffset[(unsigned char) _DNAencode('A')] = 0;
 	DNAcode2PWMrowoffset[(unsigned char) _DNAencode('C')] = 1;
 	DNAcode2PWMrowoffset[(unsigned char) _DNAencode('G')] = 2;
@@ -39,7 +39,7 @@ static int compute_score(const int *pwm, int pwm_ncol, const char *S, int nS, in
 	score = 0;
 	for (i = 0; i < pwm_ncol; i++, pwm += 4, S++) {
 		rowoffset = DNAcode2PWMrowoffset[(unsigned char) *S];
-		if (rowoffset == -1)
+		if (rowoffset == NA_INTEGER)
 			continue;
 		score += pwm[rowoffset];
 	}
@@ -98,13 +98,10 @@ SEXP match_PWM(SEXP pwm, SEXP subject, SEXP min_score, SEXP count_only)
 	minscore = INTEGER(min_score)[0];
 	is_count_only = LOGICAL(count_only)[0];
 	init_DNAcode2PWMrowoffset();	
-	_init_match_reporting(is_count_only ? COUNT_MRMODE : START_MRMODE);
+	_init_match_reporting(is_count_only ? mkString("COUNTONLY") : mkString("ASIRANGES"));
 	for (n1 = 0, n2 = pwm_ncol; n2 <= S.nelt; n1++, n2++) {
-		if (compute_score(INTEGER(pwm), pwm_ncol, S.elts, S.nelt, n1) >= minscore) {
-			// The second arg (end) is ignored in match reporting
-			// modes COUNT_MRMODE and START_MRMODE
-			_report_match(n1 + 1, -1);
-		}
+		if (compute_score(INTEGER(pwm), pwm_ncol, S.elts, S.nelt, n1) >= minscore)
+			_report_match(n1 + 1, pwm_ncol);
 	}
 	// The SEXP returned by reported_matches_asSEXP() is UNPROTECTED
 	// but you don't have to PROTECT it here since you are returning it

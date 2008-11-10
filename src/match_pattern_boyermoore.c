@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 /* I've turned off the "MWshift feature". Doesn't seem to give very good
  * results :-( To turned it on, set MWSHIFT_NPMAX to a positive integer
@@ -417,7 +416,7 @@ void _match_pattern_boyermoore(const RoSeq *P, const RoSeq *S)
 		if (j2 == P->nelt) { /* the Matching Window is a suffix */
 			if (j1 == 0) {
 				/* we have a full match! */
-				_report_match(i1 + 1, 0);
+				_report_match(i1 + 1, P->nelt);
 				shift = P0buffer_shift0;
 			} else {
 				shift = get_VSGSshift(c, j1 - 1);
