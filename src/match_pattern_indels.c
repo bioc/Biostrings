@@ -56,9 +56,8 @@ static void print_match(int start, int width, const RoSeq *P, const RoSeq *S)
 #endif
 
 /*
- * In order to avoid pollution and return a non-redundant set of matches to the
- * user, we report only "best local matches".
- * A substring S' of S is a best local match iff:
+ * In order to avoid pollution by redundant matches, we report only the "best
+ * local matches". A substring S' of S is a best local match iff:
  *   (a) nedit(P, S') <= max_mm
  *   (b) for every substring S1 of S', nedit(P, S1) > nedit(P, S')
  *   (c) for every substring S2 of S that contains S', nedit(P, S2) <= nedit(P, S')
