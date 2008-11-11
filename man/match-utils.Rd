@@ -140,7 +140,7 @@
   letters" and is defined only when the 2 strings to compare have the same
   length. So when this distance is used, only matches that have the same number
   of letters as P are considered.
-  The second distance is the "edit distance" (or Levenshtein distance): it's
+  The second distance is the "edit distance" (aka Levenshtein distance): it's
   the minimum number of operations needed to transform P into S', where an
   operation is an insertion, deletion, or substitution of a single letter.
   When this metric is used, matches can have a different number of letters
