@@ -92,7 +92,7 @@ export(
     substr, substring,
 
     ## alphabetFrequency.R:
-    alphabetFrequency, uniqueLetters,
+    alphabetFrequency, hasOnlyBaseLetters, uniqueLetters,
     strrev, mkAllStrings,
     oligonucleotideFrequency,
     dinucleotideFrequency, trinucleotideFrequency,
@@ -141,7 +141,8 @@ exportMethods(
     ## Utilities
     letter,
     substr, substring,
-    alphabetFrequency, uniqueLetters, oligonucleotideFrequency,
+    alphabetFrequency, hasOnlyBaseLetters, uniqueLetters,
+    oligonucleotideFrequency,
     chartr,
     reverse, complement, reverseComplement,
     codons, translate,
