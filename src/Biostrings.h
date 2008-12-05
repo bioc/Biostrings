@@ -712,7 +712,7 @@ SEXP build_Twobit(
 );
 
 void _match_Twobit(
-	SEXP pdict_pptb,
+	SEXP pptb_comps,
 	const RoSeq *S,
 	int fixedS
 );
@@ -731,7 +731,7 @@ SEXP build_ACtree(
 );
 
 void _match_ACtree(
-	SEXP pdict_pptb,
+	SEXP pptb_comps,
 	const RoSeq *S,
 	int fixedS
 );
@@ -742,11 +742,7 @@ void _match_ACtree(
 SEXP debug_match_pdict();
 
 SEXP XString_match_pdict(
-	SEXP pdict_type,
-	SEXP pdict_pptb,
-	SEXP pdict_length,
-	SEXP pdict_tb_width,
-	SEXP pdict_tb_unq2dup,
+	SEXP pptb_comps,
 	SEXP pdict_head,
 	SEXP pdict_tail,
 	SEXP subject,
@@ -757,11 +753,7 @@ SEXP XString_match_pdict(
 );
 
 SEXP XStringViews_match_pdict(
-	SEXP pdict_type,
-	SEXP pdict_pptb,
-	SEXP pdict_length,
-	SEXP pdict_tb_width,
-	SEXP pdict_tb_unq2dup,
+	SEXP pptb_comps,
 	SEXP pdict_head,
 	SEXP pdict_tail,
 	SEXP subject,
