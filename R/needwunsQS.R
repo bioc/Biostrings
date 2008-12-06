@@ -95,8 +95,8 @@ print.needwunsQS <- function(x, ...)
 ### align, this C version is 100 to 1000 times faster than the above
 ### .needwunsQS().
 ### 's1' and 's2' must be XString objects of the same subtype.
-### Return a PairwiseAlignment object where the "al1" and "al2" slots contain
-### the aligned versions of 's1' and 's2'.
+### Return a PairwiseAlignedFixedSubject object where the "al1" and "al2" slots
+### contain the aligned versions of 's1' and 's2'.
 XString.needwunsQS <- function(s1, s2, substmat, gappen)
 {
     .Deprecated("pairwiseAlignment")
@@ -135,7 +135,7 @@ XString.needwunsQS <- function(s1, s2, substmat, gappen)
                    substmat, nrow(substmat), lkup,
                    as.integer(gappen), gap_code,
                    PACKAGE="Biostrings")
-    new("PairwiseAlignment",
+    new("PairwiseAlignedFixedSubject",
         pattern =
         new("AlignedXStringSet",
             unaligned = XStringSet(class(s1), new(class(s1), xdata = C_ans$al1, length = length(C_ans$al1))),

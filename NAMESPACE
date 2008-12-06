@@ -249,7 +249,7 @@ exportMethods(
 ###   QualityScaledXStringSet.R
 ###   InDel-class.R
 ###   AlignedXStringSet-class.R
-###   PairwiseAlignment-class.R
+###   PairwiseAlignedFixedSubject-class.R
 ###   align-utils.R
 ###   pmatchPattern.R
 ###   pairwiseAlignment.R
@@ -264,7 +264,7 @@ exportClasses(
     QualityScaledRNAStringSet, QualityScaledAAStringSet,
     InDel,
     AlignedXStringSet, QualityAlignedXStringSet,
-    PairwiseAlignment, PairwiseAlignmentSummary
+    PairwiseAlignedFixedSubject, PairwiseAlignedFixedSubjectSummary
 )
 
 export(
@@ -285,7 +285,7 @@ export(
     ## AlignedXStringSet-class.R:
     unaligned, aligned, indel, nindel,
 
-    ## PairwiseAlignment-class.R:
+    ## PairwiseAlignedFixedSubject-class.R:
     type, score, pid,
 
     ## align-utils.R:

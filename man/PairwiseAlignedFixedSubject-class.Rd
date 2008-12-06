@@ -1,53 +1,53 @@
-\name{PairwiseAlignment-class}
+\name{PairwiseAlignedFixedSubject-class}
 \docType{class}
 
 % Classes
-\alias{class:PairwiseAlignment}
-\alias{PairwiseAlignment-class}
-\alias{PairwiseAlignment}
-\alias{class:PairwiseAlignmentSummary}
-\alias{PairwiseAlignmentSummary-class}
-\alias{PairwiseAlignmentSummary}
+\alias{class:PairwiseAlignedFixedSubject}
+\alias{PairwiseAlignedFixedSubject-class}
+\alias{PairwiseAlignedFixedSubject}
+\alias{class:PairwiseAlignedFixedSubjectSummary}
+\alias{PairwiseAlignedFixedSubjectSummary-class}
+\alias{PairwiseAlignedFixedSubjectSummary}
 
 % Constructor-like functions and generics:
-\alias{initialize,PairwiseAlignment-method}
+\alias{initialize,PairwiseAlignedFixedSubject-method}
 
 % Accesor methods:
-\alias{pattern,PairwiseAlignment-method}
-\alias{subject,PairwiseAlignment-method}
+\alias{pattern,PairwiseAlignedFixedSubject-method}
+\alias{subject,PairwiseAlignedFixedSubject-method}
 \alias{type}
-\alias{type,PairwiseAlignment-method}
-\alias{type,PairwiseAlignmentSummary-method}
+\alias{type,PairwiseAlignedFixedSubject-method}
+\alias{type,PairwiseAlignedFixedSubjectSummary-method}
 \alias{score}
-\alias{score,PairwiseAlignment-method}
-\alias{score,PairwiseAlignmentSummary-method}
-\alias{nindel,PairwiseAlignment-method}
-\alias{nindel,PairwiseAlignmentSummary-method}
-\alias{length,PairwiseAlignment-method}
-\alias{length,PairwiseAlignmentSummary-method}
-\alias{nchar,PairwiseAlignment-method}
-\alias{nchar,PairwiseAlignmentSummary-method}
-\alias{alphabet,PairwiseAlignment-method}
-\alias{aligned,PairwiseAlignment-method}
-\alias{Views,PairwiseAlignment-method}
+\alias{score,PairwiseAlignedFixedSubject-method}
+\alias{score,PairwiseAlignedFixedSubjectSummary-method}
+\alias{nindel,PairwiseAlignedFixedSubject-method}
+\alias{nindel,PairwiseAlignedFixedSubjectSummary-method}
+\alias{length,PairwiseAlignedFixedSubject-method}
+\alias{length,PairwiseAlignedFixedSubjectSummary-method}
+\alias{nchar,PairwiseAlignedFixedSubject-method}
+\alias{nchar,PairwiseAlignedFixedSubjectSummary-method}
+\alias{alphabet,PairwiseAlignedFixedSubject-method}
+\alias{aligned,PairwiseAlignedFixedSubject-method}
+\alias{Views,PairwiseAlignedFixedSubject-method}
 
 % Standard generic methods:
-\alias{show,PairwiseAlignment-method}
-\alias{show,PairwiseAlignmentSummary-method}
-\alias{summary,PairwiseAlignment-method}
-\alias{as.character,PairwiseAlignment-method}
-\alias{toString,PairwiseAlignment-method}
-\alias{as.matrix,PairwiseAlignment-method}
-\alias{[,PairwiseAlignment,ANY,ANY,ANY-method}
-\alias{[<-,PairwiseAlignment,ANY,ANY,ANY-method}
-\alias{rep,PairwiseAlignment-method}
+\alias{show,PairwiseAlignedFixedSubject-method}
+\alias{show,PairwiseAlignedFixedSubjectSummary-method}
+\alias{summary,PairwiseAlignedFixedSubject-method}
+\alias{as.character,PairwiseAlignedFixedSubject-method}
+\alias{toString,PairwiseAlignedFixedSubject-method}
+\alias{as.matrix,PairwiseAlignedFixedSubject-method}
+\alias{[,PairwiseAlignedFixedSubject,ANY,ANY,ANY-method}
+\alias{[<-,PairwiseAlignedFixedSubject,ANY,ANY,ANY-method}
+\alias{rep,PairwiseAlignedFixedSubject-method}
 
 
-\title{PairwiseAlignment and PairwiseAlignmentSummary objects}
+\title{PairwiseAlignedFixedSubject and PairwiseAlignedFixedSubjectSummary objects}
 
 \description{
-  The \code{PairwiseAlignment} class is a container for storing an alignment.
-  The \code{PairwiseAlignmentSummary} class is a container for storing the
+  The \code{PairwiseAlignedFixedSubject} class is a container for storing an alignment.
+  The \code{PairwiseAlignedFixedSubjectSummary} class is a container for storing the
   summary of an alignment.
 }
 
@@ -88,7 +88,7 @@
 
 \section{Accesor methods}{
   In the code snippets below,
-  \code{x} is a \code{PairwiseAlignment} object, except otherwise noted.
+  \code{x} is a \code{PairwiseAlignedFixedSubject} object, except otherwise noted.
 
   \describe{
     \item{}{
@@ -103,12 +103,12 @@
       \code{type(x)}:
       The type of the alignment (\code{"global"}, \code{"local"},
       \code{"overlap"}, \code{"patternOverlap"}, or \code{"subjectOverlap"}).
-      There is a method for \code{PairwiseAlignmentSummary} as well.
+      There is a method for \code{PairwiseAlignedFixedSubjectSummary} as well.
     }
     \item{}{
       \code{score(x)}:
       The score of the alignment (integer).
-      There is a method for \code{PairwiseAlignmentSummary} as well.
+      There is a method for \code{PairwiseAlignedFixedSubjectSummary} as well.
     }
     \item{}{
       \code{nindel(x)}:
@@ -117,12 +117,12 @@
     \item{}{
       \code{length(x)}:
       The length of the \code{aligned(pattern(x))} and \code{aligned(subject(x))}.
-      There is a method for \code{PairwiseAlignmentSummary} as well.
+      There is a method for \code{PairwiseAlignedFixedSubjectSummary} as well.
     }
     \item{}{
       \code{nchar(x)}:
       The nchar of the \code{aligned(pattern(x))} and \code{aligned(subject(x))}.
-      There is a method for \code{PairwiseAlignmentSummary} as well.
+      There is a method for \code{PairwiseAlignedFixedSubjectSummary} as well.
     }
     \item{}{
       \code{alphabet(x)}:
@@ -130,7 +130,7 @@
     }
     \item{}{
       \code{summary(object, ...)}:
-      Generates a summary for the \code{PairwiseAlignment}.
+      Generates a summary for the \code{PairwiseAlignedFixedSubject}.
     }
     \item{}{
       \code{aligned(x)}:
@@ -163,11 +163,11 @@
   \describe{
     \item{}{
       \code{x[i]}:
-      Returns a new \code{PairwiseAlignment} object made of the selected elements.
+      Returns a new \code{PairwiseAlignedFixedSubject} object made of the selected elements.
     }
     \item{}{
       \code{rep(x, times)}:
-      Returns a new \code{PairwiseAlignment} object made of the repeated elements.
+      Returns a new \code{PairwiseAlignedFixedSubject} object made of the repeated elements.
     }
   }
 }

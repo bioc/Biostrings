@@ -116,8 +116,8 @@ o Added many methods for pairwise alignment objects including as.matrix,
   mismatchTable, nindel, nmatch, nmismatch, pattern, pid, rep, subject, summary,
   toString, Views.
 
-o Removed the XStringAlign class and added classes PairwiseAlignment,
-  PairwiseAlignmentSummary, AlignedXStringSet, QualityAlignedXStringSet,
+o Removed the XStringAlign class and added classes PairwiseAlignedFixedSubject,
+  PairwiseAlignedFixedSubjectSummary, AlignedXStringSet, QualityAlignedXStringSet,
   QualityScaledXStringSet, QualityScaledBStringSet, QualityScaledDNAStringSet,
   QualityScaledRNAStringSet, QualityScaledAAStringSet, XStringQuality,
   PhredQuality, and SolexaQuality.

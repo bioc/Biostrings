@@ -781,7 +781,7 @@ SEXP XStringSet_vmatch_pdict(
 
 /* align_utils.c */
 
-SEXP PairwiseAlignment_nmatch(
+SEXP PairwiseAlignedFixedSubject_nmatch(
 	SEXP nchar,
 	SEXP nmismatch,
 	SEXP ninsertion,
@@ -795,7 +795,7 @@ SEXP AlignedXStringSet_align_aligned(
 	SEXP gapCode
 );
 
-SEXP PairwiseAlignment_align_aligned(
+SEXP PairwiseAlignedFixedSubject_align_aligned(
 	SEXP alignment,
 	SEXP gapCode
 );

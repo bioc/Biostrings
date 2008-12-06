@@ -1,11 +1,11 @@
 ### ==========================================================================
-### PairwiseAlignment objects
+### PairwiseAlignedFixedSubject objects
 ### --------------------------------------------------------------------------
-### An PairwiseAlignment object contains the result of the alignment of
+### An PairwiseAlignedFixedSubject object contains the result of the alignment of
 ### two XString objects of the same subtype.
 
 
-setClass("PairwiseAlignment",
+setClass("PairwiseAlignedFixedSubject",
     representation(
         pattern="AlignedXStringSet",
         subject="AlignedXStringSet",
@@ -17,7 +17,7 @@ setClass("PairwiseAlignment",
     )
 )
 
-setClass("PairwiseAlignmentSummary",
+setClass("PairwiseAlignedFixedSubjectSummary",
     representation(
         type="character",
         score="numeric",
@@ -35,7 +35,7 @@ setClass("PairwiseAlignmentSummary",
 ### Initialization.
 ###
 
-setMethod("initialize", "PairwiseAlignment",
+setMethod("initialize", "PairwiseAlignedFixedSubject",
     function(.Object, pattern, subject, type, score, substitutionArray,
              gapOpening, gapExtension, check = TRUE)
     {
@@ -67,7 +67,7 @@ setMethod("initialize", "PairwiseAlignment",
 ### Validity.
 ###
 
-.valid.PairwiseAlignment <- function(object)
+.valid.PairwiseAlignedFixedSubject <- function(object)
 {
     message <- character(0)
     if (!identical(class(unaligned(pattern(object))), class(unaligned(subject(object)))))
@@ -85,10 +85,10 @@ setMethod("initialize", "PairwiseAlignment",
     message
 }
 
-setValidity("PairwiseAlignment",
+setValidity("PairwiseAlignedFixedSubject",
     function(object)
     {
-        problems <- .valid.PairwiseAlignment(object)
+        problems <- .valid.PairwiseAlignedFixedSubject(object)
         if (is.null(problems)) TRUE else problems
     }
 )
@@ -98,35 +98,35 @@ setValidity("PairwiseAlignment",
 ### Accessor methods.
 ###
 
-setMethod("pattern", "PairwiseAlignment", function(x) x@pattern)
-setMethod("subject", "PairwiseAlignment", function(x) x@subject)
+setMethod("pattern", "PairwiseAlignedFixedSubject", function(x) x@pattern)
+setMethod("subject", "PairwiseAlignedFixedSubject", function(x) x@subject)
 
 setGeneric("type", function(x) standardGeneric("type"))
-setMethod("type", "PairwiseAlignment", function(x) x@type)
-setMethod("type", "PairwiseAlignmentSummary", function(x) x@type)
+setMethod("type", "PairwiseAlignedFixedSubject", function(x) x@type)
+setMethod("type", "PairwiseAlignedFixedSubjectSummary", function(x) x@type)
 
 setGeneric("score", function(x) standardGeneric("score"))
-setMethod("score", "PairwiseAlignment", function(x) x@score)
-setMethod("score", "PairwiseAlignmentSummary", function(x) x@score)
+setMethod("score", "PairwiseAlignedFixedSubject", function(x) x@score)
+setMethod("score", "PairwiseAlignedFixedSubjectSummary", function(x) x@score)
 
-setMethod("nindel", "PairwiseAlignment",
+setMethod("nindel", "PairwiseAlignedFixedSubject",
           function(x) new("InDel", insertion = nindel(subject(x)), deletion = nindel(pattern(x))))
-setMethod("nindel", "PairwiseAlignmentSummary",
+setMethod("nindel", "PairwiseAlignedFixedSubjectSummary",
           function(x) new("InDel", insertion = x@ninsertion, deletion = x@ndeletion))
 
-setMethod("length", "PairwiseAlignment", function(x) length(score(x)))
-setMethod("length", "PairwiseAlignmentSummary", function(x) length(score(x)))
+setMethod("length", "PairwiseAlignedFixedSubject", function(x) length(score(x)))
+setMethod("length", "PairwiseAlignedFixedSubjectSummary", function(x) length(score(x)))
 
-setMethod("nchar", "PairwiseAlignment", function(x, type="chars", allowNA=FALSE) nchar(subject(x)))
-setMethod("nchar", "PairwiseAlignmentSummary", 
+setMethod("nchar", "PairwiseAlignedFixedSubject", function(x, type="chars", allowNA=FALSE) nchar(subject(x)))
+setMethod("nchar", "PairwiseAlignedFixedSubjectSummary", 
           function(x, type="chars", allowNA=FALSE)
           unname(nmatch(x) + nmismatch(x) + x@ninsertion[,"WidthSum"] + x@ndeletion[,"WidthSum"]))
 
-setMethod("alphabet", "PairwiseAlignment", function(x) alphabet(subject(x)))
-setMethod("codec", "PairwiseAlignment", function(x) codec(subject(x)))
+setMethod("alphabet", "PairwiseAlignedFixedSubject", function(x) alphabet(subject(x)))
+setMethod("codec", "PairwiseAlignedFixedSubject", function(x) codec(subject(x)))
 
 setGeneric("pid", signature="x", function(x, type="PID1") standardGeneric("pid"))
-setMethod("pid", "PairwiseAlignment",
+setMethod("pid", "PairwiseAlignedFixedSubject",
           function(x, type="PID1") {
               type <- match.arg(type, c("PID1", "PID2", "PID3", "PID4"))
               denom <-
@@ -138,7 +138,7 @@ setMethod("pid", "PairwiseAlignment",
               100 * nmatch(x)/denom
 		  })
 
-setMethod("Views", signature = c(subject = "PairwiseAlignment"),
+setMethod("Views", signature = c(subject = "PairwiseAlignedFixedSubject"),
           function(subject, start=NA, end=NA, names=NULL)
           {
               if (all(is.na(start)))
@@ -164,7 +164,7 @@ setMethod("Views", signature = c(subject = "PairwiseAlignment"),
 ### TODO: Make the "show" method to format the alignment in a SGD fashion
 ### i.e. split in 60-letter blocks and use the "|" character to highlight
 ### exact matches.
-setMethod("show", "PairwiseAlignment", function(object)
+setMethod("show", "PairwiseAlignedFixedSubject", function(object)
           {
               if (length(object) == 0)
                   cat("Empty Pairwise Alignment\n")
@@ -194,14 +194,14 @@ setMethod("show", "PairwiseAlignment", function(object)
 ### The "summary" method.
 ###
 
-setMethod("summary", "PairwiseAlignment", function(object, weight=1L, ...)
+setMethod("summary", "PairwiseAlignedFixedSubject", function(object, weight=1L, ...)
           {
               if (!is.numeric(weight) || !(length(weight) %in% c(1, length(object))))
                   stop("'weight' must be an integer vector with length 1 or 'length(object)'")
               if (!is.integer(weight))
                 weight <- as.integer(weight)
               if (all(weight == 1))
-                  new("PairwiseAlignmentSummary",
+                  new("PairwiseAlignedFixedSubjectSummary",
                       type = type(object),
                       score = score(object),
                       nmatch = nmatch(object),
@@ -211,7 +211,7 @@ setMethod("summary", "PairwiseAlignment", function(object, weight=1L, ...)
                       coverage = coverage(object),
                       mismatchSummary = mismatchSummary(object))
               else
-                  new("PairwiseAlignmentSummary",
+                  new("PairwiseAlignedFixedSubjectSummary",
                       type = type(object),
                       score = rep(score(object), weight),
                       nmatch = rep(nmatch(object), weight),
@@ -222,7 +222,7 @@ setMethod("summary", "PairwiseAlignment", function(object, weight=1L, ...)
                       mismatchSummary = mismatchSummary(object, weight = weight))
           })
 
-setMethod("show", "PairwiseAlignmentSummary", function(object)
+setMethod("show", "PairwiseAlignedFixedSubjectSummary", function(object)
           {
               cat(switch(type(object), "global" = "Global", "overlap" = "Overlap",
                          "patternOverlap" = "Pattern Overlap", "subjectOverlap" = "Subject Overlap",
@@ -245,7 +245,7 @@ setMethod("show", "PairwiseAlignmentSummary", function(object)
 ### The "as.character" method.
 ###
 
-setMethod("aligned", "PairwiseAlignment",
+setMethod("aligned", "PairwiseAlignedFixedSubject",
           function(x) {
               codecX <- codec(x)
               if (is.null(codecX)) {
@@ -255,18 +255,18 @@ setMethod("aligned", "PairwiseAlignment",
                   names(letters2codes) <- codecX@letters
                   gapCode <- as.raw(letters2codes[["-"]])
               }
-              .Call("PairwiseAlignment_align_aligned", x, gapCode, PACKAGE="Biostrings")
+              .Call("PairwiseAlignedFixedSubject_align_aligned", x, gapCode, PACKAGE="Biostrings")
           })
 
-setMethod("as.character", "PairwiseAlignment",
+setMethod("as.character", "PairwiseAlignedFixedSubject",
           function(x)
           {
               as.character(aligned(x))
           })
 
-setMethod("toString", "PairwiseAlignment", function(x, ...) toString(as.character(x), ...))
+setMethod("toString", "PairwiseAlignedFixedSubject", function(x, ...) toString(as.character(x), ...))
 
-setMethod("as.matrix", "PairwiseAlignment",
+setMethod("as.matrix", "PairwiseAlignedFixedSubject",
           function(x) {
               as.matrix(aligned(x))
           })
@@ -276,7 +276,7 @@ setMethod("as.matrix", "PairwiseAlignment",
 ### Subsetting.
 ###
 
-setMethod("[", "PairwiseAlignment",
+setMethod("[", "PairwiseAlignedFixedSubject",
     function(x, i, j, ..., drop)
     {
         if (!missing(j) || length(list(...)) > 0)
@@ -289,7 +289,7 @@ setMethod("[", "PairwiseAlignment",
             stop("invalid subsetting")
         if (any(i < 1) || any(i > length(x)))
             stop("subscript out of bounds")
-        new("PairwiseAlignment",
+        new("PairwiseAlignedFixedSubject",
             pattern = x@pattern[i],
             subject = x@subject[i],
             type = x@type,
@@ -300,14 +300,14 @@ setMethod("[", "PairwiseAlignment",
     }
 )
 
-setReplaceMethod("[", "PairwiseAlignment",
+setReplaceMethod("[", "PairwiseAlignedFixedSubject",
     function(x, i, j,..., value)
     {
         stop("attempt to modify the value of a ", class(x), " instance")
     }
 )
 
-setMethod("rep", "PairwiseAlignment",
+setMethod("rep", "PairwiseAlignedFixedSubject",
     function(x, times)
 		x[rep.int(seq_len(length(x)), times)]
 )

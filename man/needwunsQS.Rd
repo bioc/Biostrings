@@ -25,14 +25,14 @@ This function has been deprecated and is being replaced by
 \code{pairwiseAlignment}.
 }
 \value{
-An instance of class \code{"PairwiseAlignment"}.
+An instance of class \code{"PairwiseAlignedFixedSubject"}.
 }
 \references{R. Durbin, S. Eddy, A. Krogh, G. Mitchison,
 Biological Sequence Analysis, Cambridge UP 1998, sec 2.3.}
 \author{Vince Carey (\email{stvjc@channing.harvard.edu}) (original author) and H. Pages (current maintainer).}
 \seealso{
   \link{pairwiseAlignment},
-  \link{PairwiseAlignment-class},
+  \link{PairwiseAlignedFixedSubject-class},
   \link{substitution.matrices}
 }
 \examples{
