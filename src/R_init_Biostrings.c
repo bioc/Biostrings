@@ -118,6 +118,12 @@ static const R_CallMethodDef callMethods[] = {
 	CALLMETHOD_DEF(build_ACtree, 3),
 	CALLMETHOD_DEF(ACtree_summary, 1),
 
+/* match_pdict_ACtree2.c */
+	CALLMETHOD_DEF(debug_match_pdict_ACtree2, 0),
+	CALLMETHOD_DEF(ACtree2_print_nodes, 1),
+	CALLMETHOD_DEF(ACtree2_summary, 1),
+	CALLMETHOD_DEF(ACtree2_build, 3),
+
 /* match_pdict.c */
 	CALLMETHOD_DEF(debug_match_pdict, 0),
 	CALLMETHOD_DEF(XString_match_pdict, 8),

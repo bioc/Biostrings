@@ -721,6 +721,12 @@ SEXP _get_ACtree_nodes_tag(SEXP x);
 
 SEXP _get_ACtree_base_codes(SEXP x);
 
+SEXP _get_ACtree2_nodes_tag(SEXP x);
+
+SEXP _get_ACtree2_extensions_tag(SEXP x);
+
+SEXP _get_ACtree2_base_codes(SEXP x);
+
 
 /* match_pdict_Twobit.c */
 
@@ -757,6 +763,21 @@ void _match_ACtree(
 	SEXP pptb,
 	const RoSeq *S,
 	int fixedS
+);
+
+
+/* match_pdict_ACtree2.c */
+
+SEXP debug_match_pdict_ACtree2();
+
+SEXP ACtree2_print_nodes(SEXP pptb);
+
+SEXP ACtree2_summary(SEXP pptb);
+
+SEXP ACtree2_build(
+	SEXP tb,
+	SEXP dup2unq0,
+	SEXP base_codes
 );
 
 
