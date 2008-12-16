@@ -104,6 +104,11 @@ SEXP _get_ACtree2_extensions_tag(SEXP x)
 	return get_XSequence_tag(GET_SLOT(x, install("extensions")));
 }
 
+int _get_ACtree2_nextensions(SEXP x)
+{
+	return INTEGER(get_XSequence_tag(GET_SLOT(x, install("nextensions"))))[0];
+}
+
 SEXP _get_ACtree2_base_codes(SEXP x)
 {
 	return GET_SLOT(x, install("base_codes"));

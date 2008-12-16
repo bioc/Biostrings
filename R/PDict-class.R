@@ -198,8 +198,9 @@ setMethod("initialize", "ACtree",
 setClass("ACtree2",
     contains="PreprocessedTB",
     representation(
-        nodes="XInteger",       # 2 ints per node
-        extensions="XInteger",  # 5 ints per extension
+        nodes="XInteger",        # 2 ints per node
+        extensions="XInteger",   # 5 ints per extension
+        nextensions="XInteger",  # a single int
         base_codes="integer"
     )
 )
@@ -222,6 +223,7 @@ setMethod("initialize", "ACtree2",
         .Object <- callNextMethod(.Object, tb, C_ans$dup2unq)
         .Object@nodes <- C_ans$ACtree$nodes
         .Object@extensions <- C_ans$ACtree$extensions
+        .Object@nextensions <- C_ans$ACtree$nextensions
         .Object@base_codes <- base_codes
         .Object
     }
