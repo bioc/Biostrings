@@ -16,18 +16,6 @@
 
 static int debug = 0;
 
-SEXP debug_match_pdict_ACtree2()
-{
-#ifdef DEBUG_BIOSTRINGS
-	debug = !debug;
-	Rprintf("Debug mode turned %s in file %s\n",
-		debug ? "on" : "off", __FILE__);
-#else
-	Rprintf("Debug mode not available in file %s\n", __FILE__);
-#endif
-	return R_NilValue;
-}
-
 
 
 /****************************************************************************
@@ -35,6 +23,23 @@ SEXP debug_match_pdict_ACtree2()
  ****************************************************************************/
 
 #define MAX_CHILDREN_PER_NODE 4
+
+typedef struct acnode {
+	int attribs;
+	int nid_or_eid;
+} ACnode;
+
+typedef struct acnode_extension {
+	int link_nid[MAX_CHILDREN_PER_NODE];
+	int flink_nid;
+} ACnodeExtension;
+
+#define INTS_PER_NODE (sizeof(ACnode) / sizeof(int))
+#define TREE_MAX_NNODES (INT_MAX / INTS_PER_NODE)
+
+#define INTS_PER_EXTENSION (sizeof(ACnodeExtension) / sizeof(int))
+#define TREE_MAX_NEXTENSIONS (INT_MAX / INTS_PER_EXTENSION)
+
 #define LINKTAG_BITSHIFT 28
 #define LINKTAG_BITMASK (3 << LINKTAG_BITSHIFT)
 #define MAX_DEPTH ((1 << LINKTAG_BITSHIFT) - 1)
@@ -42,30 +47,44 @@ SEXP debug_match_pdict_ACtree2()
 #define ISEXTENDED_BIT (ISLEAF_BIT << 1) /* strongest bit for 32-bit integers */
 #define MAX_P_ID (ISLEAF_BIT - 1)  /* P_id values are encoded on 30 bits */
 
-typedef struct acnode {
-	int attribs;
-	int nid_or_eid;
-} ACnode;
+SEXP debug_match_pdict_ACtree2()
+{
+#ifdef DEBUG_BIOSTRINGS
+	debug = !debug;
+	Rprintf("Debug mode turned %s in file %s\n",
+		debug ? "on" : "off", __FILE__);
+	if (debug) {
+		Rprintf("[DEBUG] debug_match_pdict_ACtree2():\n"
+			"  INTS_PER_NODE=%d TREE_MAX_NNODES=%d\n"
+			"  INTS_PER_EXTENSION=%d TREE_MAX_NEXTENSIONS=%d\n"
+			"  LINKTAG_BITSHIFT=%d LINKTAG_BITMASK=%d\n"
+			"  MAX_DEPTH=%d\n"
+			"  ISLEAF_BIT=%d ISEXTENDED_BIT=%d\n"
+			"  MAX_P_ID=%d\n",
+			INTS_PER_NODE, TREE_MAX_NNODES,
+			INTS_PER_EXTENSION, TREE_MAX_NEXTENSIONS,
+			LINKTAG_BITSHIFT, LINKTAG_BITMASK,
+			MAX_DEPTH,
+			ISLEAF_BIT, ISEXTENDED_BIT,
+			MAX_P_ID);
+	}
+#else
+	Rprintf("Debug mode not available in file %s\n", __FILE__);
+#endif
+	return R_NilValue;
+}
 
-#define INTS_PER_NODE (sizeof(ACnode) / sizeof(int))
 #define ISEXTENDED(node) ((node)->attribs & ISEXTENDED_BIT)
 #define ISLEAF(node) ((node)->attribs & ISLEAF_BIT)
 #define GET_DEPTH(node) ((node)->attribs & MAX_DEPTH)
 #define GET_P_ID(node) ((node)->attribs & MAX_P_ID)
 
-typedef struct acnode_extension {
-	int link_nid[MAX_CHILDREN_PER_NODE];
-	int flink_nid;
-} ACnodeExtension;
-
-#define INTS_PER_EXTENSION (sizeof(ACnodeExtension) / sizeof(int))
-
 typedef struct actree {
 	int depth;  /* this is the depth of all leaf nodes */
 	ACnode *nodes;
-	int nnodes, nodes_buflength;
+	int nodes_buflength, nnodes;
 	ACnodeExtension *extensions;
-	int nextensions, extensions_buflength;
+	int extensions_buflength, nextensions;
 	ByteTrTable char2linktag;
 } ACtree;
 
@@ -73,6 +92,19 @@ typedef struct actree {
 #define TREE_NNODES(tree) ((tree)->nnodes)
 #define GET_NODE(tree, nid) ((tree)->nodes + (nid))
 #define CHAR2LINKTAG(tree, c) ((tree)->char2linktag[(unsigned char) (c)])
+
+static int max_needed_nextensions_at_pp_time(int tb_length, int tb_width)
+{
+	int nextensions, depth;
+
+	nextensions = 1;
+	for (depth = 0; depth < tb_width; depth++) {
+		if (nextensions > tb_length)
+			break;
+		nextensions *= 2;
+	}
+	return nextensions - 1;
+}
 
 /* extends the 'nodes' slot */
 static void extend_nodes_buffer(ACtree *tree)
@@ -117,7 +149,8 @@ static SEXP ACtree_nodes_asXInteger(ACtree *tree)
 
 	tag_length = tree->nnodes * INTS_PER_NODE;
 	PROTECT(tag = NEW_INTEGER(tag_length));
-	memcpy(INTEGER(tag), tree->nodes, tag_length * sizeof(int));
+	memcpy(INTEGER(tag), tree->nodes,
+			tree->nnodes * sizeof(ACnode));
 	PROTECT(ans = new_XInteger_from_tag("XInteger", tag));
 	UNPROTECT(2);
 	return ans;
@@ -125,12 +158,22 @@ static SEXP ACtree_nodes_asXInteger(ACtree *tree)
 
 static SEXP ACtree_extensions_asXInteger(ACtree *tree)
 {
-	int tag_length;
+	int extensions_buflength, tag_length;
 	SEXP ans, tag;
 
-	tag_length = tree->nextensions * INTS_PER_EXTENSION;
+	/* Having a nb of preallocated extensions being 40% of the nb of
+           nodes makes the 'extensions' slot of the resulting "ACtree2"
+           object of the same size as the 'nodes' slot. Then the total size
+           for these 2 slots ('nodes' + 'extensions') is half the size of the
+           'nodes' slot of the corresponding "ACtree" object. */
+	extensions_buflength = (int) (tree->nnodes * 0.4);
+	if (tree->nextensions > extensions_buflength)
+		error("ACtree_extensions_asXInteger(): "
+		      "tree->nextensions > extensions_buflength");
+	tag_length = extensions_buflength * INTS_PER_EXTENSION;
 	PROTECT(tag = NEW_INTEGER(tag_length));
-	memcpy(INTEGER(tag), tree->extensions, tag_length * sizeof(int));
+	memcpy(INTEGER(tag), tree->extensions,
+			tree->nextensions * sizeof(ACnodeExtension));
 	PROTECT(ans = new_XInteger_from_tag("XInteger", tag));
 	UNPROTECT(2);
 	return ans;
@@ -229,28 +272,36 @@ static void set_ACnode_flink(ACtree *tree, ACnode *node, int nid)
 }
 
 static void init_ACtree(ACtree *tree, int tb_length, int tb_width,
-		int max_needed_nodes, SEXP base_codes)
+		int max_needed_nnodes, SEXP base_codes)
 {
+	int n1, n2;
+
+	n1 = max_needed_nnodes;
+	n2 = max_needed_nextensions_at_pp_time(tb_length, tb_width);
+#ifdef DEBUG_BIOSTRINGS
+	if (debug) {
+		Rprintf("[DEBUG] init_ACtree():\n"
+			"  tb_length=%d tb_width=%d\n"
+			"  max_needed_nnodes=%d max_needed_nextensions=%d\n",
+			tb_length, tb_width,
+			n1, n2);
+	}
+#endif
 	if (tb_length > MAX_P_ID)
 		error("init_ACtree(): tb_length > MAX_P_ID");
 	if (tb_width > MAX_DEPTH)
 		error("init_ACtree(): tb_width > MAX_DEPTH");
+	if (n1 >= TREE_MAX_NNODES || n2 >= TREE_MAX_NEXTENSIONS)
+		error("Trusted Band is too big (please reduce its "
+		      "width or its length)");
+
 	tree->depth = tb_width;
-
-	tree->nodes = NULL;
-	tree->nnodes = tree->nodes_buflength = 0;
-	/* for testing */
-	tree->nodes = Salloc((long) max_needed_nodes, ACnode);
+	tree->nodes = Salloc((long) n1, ACnode);
+	tree->nodes_buflength = n1;
 	tree->nnodes = 0;
-	tree->nodes_buflength = max_needed_nodes;
-
-	tree->extensions = NULL;
-	tree->nextensions = tree->extensions_buflength = 0;
-	/* for testing */
-	max_needed_nodes = max_needed_nodes / 4;
-	tree->extensions = Salloc((long) max_needed_nodes, ACnodeExtension);
+	tree->extensions = Salloc((long) n2, ACnodeExtension);
+	tree->extensions_buflength = n2;
 	tree->nextensions = 0;
-	tree->extensions_buflength = max_needed_nodes;
 
 	_init_byte2offset_with_INTEGER(tree->char2linktag, base_codes, 1);
 	new_ACnode(tree, 0);  /* create the root node */
@@ -376,7 +427,7 @@ SEXP ACtree2_summary(SEXP pptb)
  *                             D. PREPROCESSING                             *
  ****************************************************************************/
 
-static int max_needed_nodes(int tb_length, int tb_width)
+static int max_needed_nnodes(int tb_length, int tb_width)
 {
 	int nnodes, depth, pow;
 
@@ -440,7 +491,7 @@ static void pp_pattern(ACtree *tree, const RoSeq *P, int P_offset)
 SEXP ACtree2_build(SEXP tb, SEXP dup2unq0, SEXP base_codes)
 {
 	ACtree tree;
-	int tb_length, tb_width, P_offset, m;
+	int tb_length, tb_width, P_offset, n;
 	CachedXStringSet cached_tb;
 	RoSeq P;
 	SEXP ans, ans_names, ans_elt;
@@ -465,8 +516,8 @@ SEXP ACtree2_build(SEXP tb, SEXP dup2unq0, SEXP base_codes)
 				error("first element in Trusted Band "
 				      "is of length 0");
 			tb_width = P.nelt;
-			m = max_needed_nodes(tb_length, tb_width);
-			init_ACtree(&tree, tb_length, tb_width, m, base_codes);
+			n = max_needed_nnodes(tb_length, tb_width);
+			init_ACtree(&tree, tb_length, tb_width, n, base_codes);
 		} else if (P.nelt != tb_width) {
 			error("element %d in Trusted Band has a different "
 			      "length than first element", P_offset + 1);
