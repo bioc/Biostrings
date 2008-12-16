@@ -19,7 +19,7 @@ static int debug = 0;
 
 
 /****************************************************************************
- *                    A. DEFINES AND LOW-LEVEL UTILITIES                    *
+ *                                A. DEFINES                                *
  ****************************************************************************/
 
 #define MAX_CHILDREN_PER_NODE 4
@@ -94,6 +94,12 @@ typedef struct actree {
 #define TREE_NEXTENSIONS(tree) ((tree)->nextensions)
 #define GET_EXTENSION(tree, eid) ((tree)->extensions + (eid))
 #define CHAR2LINKTAG(tree, c) ((tree)->char2linktag[(unsigned char) (c)])
+
+
+
+/****************************************************************************
+ *                          B. LOW-LEVEL UTILITIES                          *
+ ****************************************************************************/
 
 static int max_needed_nextensions_at_pp_time(int tb_length, int tb_width)
 {
@@ -196,7 +202,7 @@ static SEXP ACtree_nextensions_asXInteger(ACtree *tree)
 
 
 /****************************************************************************
- *                      B. Aho-Corasick tree low-level API                  *
+ *                           C. Aho-Corasick tree API                       *
  ****************************************************************************/
 
 static int new_ACnode(ACtree *tree, int depth)
@@ -398,7 +404,7 @@ static int get_ACnode_nlinks(ACtree *tree, ACnode *node)
 
 
 /****************************************************************************
- *                       C. STATS AND DEBUG UTILITIES                       *
+ *                       D. STATS AND DEBUG UTILITIES                       *
  ****************************************************************************/
 
 SEXP ACtree2_print_nodes(SEXP pptb)
@@ -448,7 +454,7 @@ SEXP ACtree2_summary(SEXP pptb)
 
 
 /****************************************************************************
- *                             D. PREPROCESSING                             *
+ *                             E. PREPROCESSING                             *
  ****************************************************************************/
 
 static int max_needed_nnodes(int tb_length, int tb_width)
@@ -465,9 +471,9 @@ static int max_needed_nnodes(int tb_length, int tb_width)
 	return nnodes;
 }
 
-static void pp_pattern(ACtree *tree, const RoSeq *P, int P_offset)
+static void add_pattern(ACtree *tree, const RoSeq *P, int P_offset)
 {
-	int P_id, depth, dmax, nid1, nid2, linktag;;
+	int P_id, depth, dmax, nid1, nid2, linktag;
 	ACnode *node1, *node2;
 
 	P_id = P_offset + 1;
@@ -546,7 +552,7 @@ SEXP ACtree2_build(SEXP tb, SEXP dup2unq0, SEXP base_codes)
 			error("element %d in Trusted Band has a different "
 			      "length than first element", P_offset + 1);
 		}
-		pp_pattern(&tree, &P, P_offset);
+		add_pattern(&tree, &P, P_offset);
 	}
 
 	PROTECT(ans = NEW_LIST(2));
@@ -575,6 +581,28 @@ SEXP ACtree2_build(SEXP tb, SEXP dup2unq0, SEXP base_codes)
 
 
 /****************************************************************************
- *                             E. MATCH FINDING                             *
+ *                             F. MATCH FINDING                             *
  ****************************************************************************/
+
+static int transition(ACtree *tree, int nid, const char *Stail, int linktag);
+
+static int follow_path(ACtree *tree, const char *path, int path_len)
+{
+	int n, nid, linktag;
+	ACnode *node;
+
+	for (n = 0, nid = 0; n < path_len; n++) {
+		node = GET_NODE(tree, nid);
+		linktag = CHAR2LINKTAG(tree, *path);
+		nid = transition(tree, nid, path, linktag);
+		path++;
+	}
+	return nid;
+}
+
+static int transition(ACtree *tree, int nid, const char *Stail, int linktag)
+{
+	return 0;
+}
+
 
