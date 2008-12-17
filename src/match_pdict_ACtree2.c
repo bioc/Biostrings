@@ -177,12 +177,17 @@ static SEXP ACtree_extensions_asXInteger(ACtree *tree)
 	SEXP ans, tag;
 
 	/* Having a nb of preallocated extensions being 40% of the nb of
-           nodes makes the 'extensions' slot of the resulting "ACtree2"
-           object of the same size as the 'nodes' slot. Then the total size
-           for these 2 slots ('nodes' + 'extensions') is half the size of the
-           'nodes' slot of the corresponding "ACtree" object. */
-	//extensions_buflength = (int) (TREE_NNODES(tree) * 0.4);
-	extensions_buflength = (int) (TREE_NNODES(tree) * 0.3);
+	   nodes makes the buffer of extensions (stored in the 'extensions'
+	   slot of the resulting "ACtree2" object) of the same size as the
+	   'nodes' slot. Therefore the total size for these 2 slots ('nodes'
+	   + 'extensions') is half the size of the 'nodes' slot of the
+	   corresponding old "ACtree" object.
+	   Note that there is no guarantee that choosing this size for the
+	   buffer of extensions will always save us from having to reallocate
+	   during the typical life cycle of the PDict object (e.g. after it
+	   has been used on a full genome), but some simulations with real
+	   data tend to show that most of the times it will. */
+	extensions_buflength = (int) (TREE_NNODES(tree) * 0.4);
 	if (TREE_NEXTENSIONS(tree) > extensions_buflength)
 		error("ACtree_extensions_asXInteger(): "
 		      "TREE_NEXTENSIONS(tree) > extensions_buflength");
