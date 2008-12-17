@@ -37,7 +37,7 @@ int _get_PreprocessedTB_width(SEXP x)
 	SEXP tb;
 
 	tb = GET_SLOT(x, install("tb"));
-	return INTEGER(get_IRanges_start(_get_XStringSet_ranges(tb)))[0];
+	return INTEGER(get_IRanges_width(_get_XStringSet_ranges(tb)))[0];
 }
 
 /* Be careful that this function does NOT copy the returned slot! (this
