@@ -224,6 +224,7 @@ export(
 
 exportMethods(
     ls,
+    length, names, "names<-", show, "[[",
     startIndex, endIndex, countIndex, unlist,
     neditStartingAt, neditEndingAt,
     isMatchingStartingAt, isMatchingEndingAt,
