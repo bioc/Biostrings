@@ -38,7 +38,7 @@
 ### 1. Trying to simulate Solexa data:
 ###      > library(Biostrings)
 ###      > dict_length <- 10^6
-###      > s <- DNAString(paste(sample(c("A", "C", "G", "T"), 36*dict_length,
+###      > s <- DNAString(paste(sample(DNA_BASES, 36*dict_length,
 ###                                    replace=TRUE), collapse=""))
 ###      > views_start <- (0:(dict_length-1)) * 36 + 1
 ###      > dict <- Views(s, start=views_start, end=views_start + 35) # the original dict
@@ -318,7 +318,7 @@
         stop("'pdict' must be a PDict object")
     if (is.null(dups(pdict)))
         return(ans)
-    if (count.only) { # countPDict()
+    if (count.only) { # vcountPDict()
         which_is_dup <- which(duplicated(pdict))
         ans[which_is_dup, ] <- ans[dups(pdict)@dup2unq[which_is_dup], ]
         return(ans)

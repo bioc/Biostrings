@@ -6,6 +6,7 @@
 \alias{DNAString-class}
 
 % Constants:
+\alias{DNA_BASES}
 \alias{DNA_ALPHABET}
 
 % Constructor-like functions and generics:
@@ -62,7 +63,7 @@
 }
 
 \section{Accessor methods}{
-  In the code snippet below, \code{x} is a \link{DNAString} object.
+  In the code snippet below, \code{x} is a DNAString object.
 
   \describe{
     \item{}{
@@ -87,10 +88,11 @@
 }
 
 \examples{
+  DNA_BASES
   DNA_ALPHABET
   d <- DNAString("TTGAAAA-CTC-N")
   length(d)
-  alphabet(d)
+  alphabet(d)  # DNA_ALPHABET
 }
 
 \keyword{methods}

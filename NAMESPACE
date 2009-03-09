@@ -32,7 +32,7 @@ export(
     RNA_GENETIC_CODE,
 
     ## XStringCodec-class.R:
-    DNA_ALPHABET, RNA_ALPHABET, AA_ALPHABET,
+    DNA_BASES, RNA_BASES, DNA_ALPHABET, RNA_ALPHABET, AA_ALPHABET,
 
     ## XString-class.R:
     BString, DNAString, RNAString, AAString, alphabet,

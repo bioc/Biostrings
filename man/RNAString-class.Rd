@@ -6,6 +6,7 @@
 \alias{RNAString-class}
 
 % Constants:
+\alias{RNA_BASES}
 \alias{RNA_ALPHABET}
 
 % Constructor-like functions and generics:
@@ -63,7 +64,7 @@
 }
 
 \section{Accessor methods}{
-  In the code snippet below, \code{x} is an \link{RNAString} object.
+  In the code snippet below, \code{x} is an RNAString object.
 
   \describe{
     \item{}{
@@ -88,15 +89,16 @@
 }
 
 \examples{
+  RNA_BASES
+  RNA_ALPHABET
   d <- DNAString("TTGAAAA-CTC-N")
   r <- RNAString(d)
   r
-  alphabet(r)
-  RNA_ALPHABET
+  alphabet(r)  # RNA_ALPHABET
 
   ## When comparing an RNAString object with a DNAString object,
   ## U and T are considered equals:
-  r == d
+  r == d  # TRUE
 }
 
 \keyword{methods}
