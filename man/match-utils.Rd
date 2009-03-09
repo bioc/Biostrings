@@ -83,7 +83,7 @@
   }
   \item{subject}{
     An \link{XString} object (or character vector) containing the subject
-    sequence,
+    sequence.
   }
   \item{starting.at, ending.at, at}{
     An integer vector specifying the starting (for \code{starting.at}
