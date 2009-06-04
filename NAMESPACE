@@ -62,6 +62,7 @@ exportMethods(
     xsbasetype, "xsbasetype<-", alphabet,
     names, "[", "[[", rep, append,
     union, intersect, setdiff, setequal,
+    "%in%", match,
     show,
     "==", "!=", duplicated, unique, order, sort, rank,
     coerce, as.character, unlist, as.matrix, as.list, toString, toComplex,
