@@ -313,14 +313,23 @@ static int cmp_RoSeq(const void *p1, const void *p2)
 }
 
 static const RoSeq *base_seq;
+static const int *base_order;
 
-static int cmp_RoSeq_indices(const void *p1, const void *p2)
+static int cmp_RoSeq_indices_for_ordering(const void *p1, const void *p2)
 {
-	int i1, i2;
+	int i1, i2, val;
 
 	i1 = *((const int *) p1);
 	i2 = *((const int *) p2);
-	return cmp_RoSeq(base_seq + i1, base_seq + i2);
+	val = cmp_RoSeq(base_seq + i1, base_seq + i2);
+	if (val == 0)
+		val = i1 - i2;
+	return val;
+}
+
+static int cmp_RoSeq_indices_for_matching(const void *key, const void *p)
+{
+	return cmp_RoSeq(key, base_seq + base_order[*((const int *) p)]);
 }
 
 void _get_RoSeqs_order(const RoSeqs *seqs, int *order, int base1)
@@ -336,7 +345,7 @@ void _get_RoSeqs_order(const RoSeqs *seqs, int *order, int base1)
 		for (i = 0; i < seqs->nelt; i++)
 			order[i] = i + 1; // 1-based indices
 	}
-	qsort(order, seqs->nelt, sizeof(int), cmp_RoSeq_indices);
+	qsort(order, seqs->nelt, sizeof(int), cmp_RoSeq_indices_for_ordering);
 	return;
 }
 
@@ -359,6 +368,10 @@ void _get_RoSeqs_rank(const RoSeqs *seqs, int *rank)
 }
 
 
+/*****************************************************************************
+ * Getting duplicated information for a RoSeqs struct.
+ */
+
 void _get_RoSeqs_duplicated(const RoSeqs *seqs, int *duplicated)
 {
     int i, *order;
@@ -366,7 +379,7 @@ void _get_RoSeqs_duplicated(const RoSeqs *seqs, int *duplicated)
 	order = (int *) R_alloc(seqs->nelt, sizeof(int));
 	_get_RoSeqs_order(seqs, order, 0);
 
-	if (seqs->nelt > 1) {
+	if (seqs->nelt > 0) {
 		duplicated[order[0]] = 0;
 	    for (i = 1; i < seqs->nelt; i++)
 	        duplicated[order[i]] =
@@ -382,11 +395,100 @@ void _get_RoSeqs_not_duplicated(const RoSeqs *seqs, int *not_duplicated)
 	order = (int *) R_alloc(seqs->nelt, sizeof(int));
 	_get_RoSeqs_order(seqs, order, 0);
 
-	if (seqs->nelt > 1) {
+	if (seqs->nelt > 0) {
 		not_duplicated[order[0]] = 1;
 	    for (i = 1; i < seqs->nelt; i++)
 	        not_duplicated[order[i]] =
 	        	(cmp_RoSeq(seqs->elts + order[i], seqs->elts + order[i-1]) != 0);
 	}
     return;
+}
+
+
+/*****************************************************************************
+ * Getting identical matching information for a RoSeqs struct.
+ */
+
+void _get_RoSeqs_in_set(const RoSeqs *seqs, const RoSeqs *set, int *in_set)
+{
+	int i, n, *seqs_order, *set_order, *curr_found, *prev_found;
+	void *curr_seq;
+
+	seqs_order = (int *) R_alloc(seqs->nelt, sizeof(int));
+	_get_RoSeqs_order(seqs, seqs_order, 0);
+
+	set_order = (int *) R_alloc(set->nelt, sizeof(int));
+	_get_RoSeqs_order(set, set_order, 0);
+
+	base_seq = set->elts;
+	base_order = set_order;
+
+	curr_found = (int *) R_alloc(set->nelt, sizeof(int));
+	for (i = 0; i < set->nelt; i++)
+		curr_found[i] = i;
+
+	n = set->nelt;
+	prev_found = curr_found;
+	memset(in_set, 0, seqs->nelt * sizeof(int));
+	for (i = 0; i < seqs->nelt; i++) {
+		curr_seq = (void *) (seqs->elts + seqs_order[i]);
+		curr_found =
+			(int *) bsearch(curr_seq, curr_found, n, sizeof(int),
+					        cmp_RoSeq_indices_for_matching);
+		if (curr_found == NULL) {
+			curr_found = prev_found;
+		} else {
+//			while ((*curr_found > 0) &&
+//				   (cmp_RoSeq(curr_seq,
+//						      set->elts + set_order[*curr_found - 1]) == 0))
+//				curr_found--;
+			in_set[seqs_order[i]] = 1;
+			n -= *curr_found - *prev_found;
+			prev_found = curr_found;
+		}
+	}
+	return;
+}
+
+
+void _get_RoSeqs_match(const RoSeqs *seqs, const RoSeqs *set, int nomatch,
+		               int *match_pos)
+{
+	int i, n, *seqs_order, *set_order, *curr_found, *prev_found;
+	void *curr_seq;
+
+	seqs_order = (int *) R_alloc(seqs->nelt, sizeof(int));
+	_get_RoSeqs_order(seqs, seqs_order, 0);
+
+	set_order = (int *) R_alloc(set->nelt, sizeof(int));
+	_get_RoSeqs_order(set, set_order, 0);
+
+	base_seq = set->elts;
+	base_order = set_order;
+
+	curr_found = (int *) R_alloc(set->nelt, sizeof(int));
+	for (i = 0; i < set->nelt; i++)
+		curr_found[i] = i;
+
+	n = set->nelt;
+	prev_found = curr_found;
+	for (i = 0; i < seqs->nelt; i++) {
+		curr_seq = (void *) (seqs->elts + seqs_order[i]);
+		curr_found =
+			(int *) bsearch(curr_seq, curr_found, n, sizeof(int),
+					        cmp_RoSeq_indices_for_matching);
+		if (curr_found == NULL) {
+			match_pos[seqs_order[i]] = nomatch;
+			curr_found = prev_found;
+		} else {
+			while ((*curr_found > 0) &&
+				   (cmp_RoSeq(curr_seq,
+						      set->elts + set_order[*curr_found - 1]) == 0))
+				curr_found--;
+			match_pos[seqs_order[i]] = set_order[*curr_found] + 1;
+			n -= *curr_found - *prev_found;
+			prev_found = curr_found;
+		}
+	}
+	return;
 }

@@ -590,6 +590,48 @@ setMethod("setequal", c("XStringSet", "XStringSet"),
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### The "%in%" and match methods.
+###
+
+setMethod("%in%", c("character", "XStringSet"),
+    function(x, table)
+        XStringSet(xsbasetype(table), x) %in% table
+)
+
+setMethod("%in%", c("XString", "XStringSet"),
+    function(x, table)
+        XStringSet(xsbasetype(table), x) %in% table
+)
+
+setMethod("%in%", c("XStringSet", "XStringSet"),
+    function(x, table)
+        .Call("XStringSet_in_set", x, table, PACKAGE = "Biostrings")
+)
+
+setMethod("match", c("character", "XStringSet"),
+    function (x, table, nomatch = NA_integer_, incomparables = NULL)
+        match(XStringSet(xsbasetype(table), x), table, nomatch = nomatch,
+              incomparables = incomparables)
+)
+
+setMethod("match", c("XString", "XStringSet"),
+    function (x, table, nomatch = NA_integer_, incomparables = NULL)
+        match(XStringSet(xsbasetype(table), x), table, nomatch = nomatch,
+              incomparables = incomparables)
+)
+
+setMethod("match", c("XStringSet", "XStringSet"),
+    function (x, table, nomatch = NA_integer_, incomparables = NULL) {
+        if (!is.null(incomparables))
+            stop("'incomparables' argument is not supported")
+        if (!isSingleNumberOrNA(nomatch))
+            stop("'nomatch' must be a single integer")
+        nomatch <- as.integer(nomatch)
+        .Call("XStringSet_match", x, table, nomatch, PACKAGE = "Biostrings")
+    }
+)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Equality.
 ###
 
@@ -677,7 +719,8 @@ setMethod("sort", "XStringSet",
 
 setMethod("rank", "XStringSet",
     function(x, na.last = TRUE,
-             ties.method = c("average", "first", "random", "max", "min")) {
+             ties.method = c("average", "first", "random", "max", "min"))
+    {
          if (!missing(na.last) && !isTRUE(na.last))
              warning("argument 'na.last' is ignored when ordering XStringSet objects")
          if (!missing(ties.method) && ties.method != "min")
@@ -693,19 +736,14 @@ setMethod("rank", "XStringSet",
 
 .XStringSet_not_duplicated <-
     function(x, incomparables=FALSE, ...)
-    .Call("XStringSet_not_duplicated", x, PACKAGE="Biostrings")
+        .Call("XStringSet_not_duplicated", x, PACKAGE="Biostrings")
 
 setMethod("duplicated", "XStringSet",
-        function(x, incomparables=FALSE, ...)
-        {
-            .Call("XStringSet_duplicated", x, PACKAGE="Biostrings")
-        }
+    function(x, incomparables=FALSE, ...)
+        .Call("XStringSet_duplicated", x, PACKAGE="Biostrings")
 )
 
 setMethod("unique", "XStringSet",
-        function(x, incomparables=FALSE, ...)
-        {
-            x[.XStringSet_not_duplicated(x, incomparables=incomparables, ...)]
-        }
+    function(x, incomparables=FALSE, ...)
+        x[.XStringSet_not_duplicated(x, incomparables=incomparables, ...)]
 )
-

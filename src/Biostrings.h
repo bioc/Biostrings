@@ -181,6 +181,19 @@ void _get_RoSeqs_not_duplicated(
 	int *not_duplicated
 );
 
+void _get_RoSeqs_in_set(
+	const RoSeqs *seqs,
+	const RoSeqs *set,
+	int *in_set
+);
+
+void _get_RoSeqs_match(
+	const RoSeqs *seqs,
+	const RoSeqs *set,
+	int nomatch,
+	int *in_set
+);
+
 
 /* XString_class.c */
 
@@ -310,6 +323,10 @@ SEXP XStringSet_rank(SEXP x);
 SEXP XStringSet_duplicated(SEXP x);
 
 SEXP XStringSet_not_duplicated(SEXP x);
+
+SEXP XStringSet_in_set(SEXP x, SEXP table);
+
+SEXP XStringSet_match(SEXP x, SEXP table, SEXP nomatch);
 
 
 /* xscat.c */
