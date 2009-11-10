@@ -2,6 +2,7 @@
 ### alphabetFrequency()
 ### hasOnlyBaseLetters()
 ### uniqueLetters()
+### letterFrequencyInSlidingView()
 ### mkAllStrings()
 ### oligonucleotideFrequency()
 ### dinucleotideFrequency()
@@ -36,13 +37,13 @@
     collapse
 }
 
-.normargWidth <- function(width)
+.normargWidth <- function(width, argname="width")
 {
     if (!isSingleNumber(width))
-        stop("'width' must be a single integer")
+        stop("'", argname, "' must be a single integer")
     width <- as.integer(width)
     if (width < 0L)
-        stop("'width' must be a non-negative integer")
+        stop("'", argname, "' must be a non-negative integer")
     width
 }
 
@@ -77,6 +78,15 @@
     if (simplify.as == "matrix" && as.array)
         stop("'as.array' cannot be TRUE when 'simplify.as' is \"matrix\"")
     simplify.as
+}
+
+### Author: HJ
+.normargLetters <- function(letters)
+{
+    ans <- unlist(strsplit(letters, NULL, fixed=TRUE))
+    if (any(duplicated(ans)))
+        stop("'letters' must be unique")
+    ans
 }
 
 
@@ -308,6 +318,78 @@ safeLettersToInt <- function(x, letters.as.names=FALSE)
         names(ans) <- x
     ans
 }
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### The "letterFrequencyInSlidingView" generic and methods.
+### Author: HJ
+###
+
+.XString.code_frequency_in_sliding_view <- function(x, view.width, letters, OR)
+{
+    codes <- xscodes(x)
+    view.width <- .normargWidth(view.width, "view.width")
+    single_letters <- .normargLetters(letters)
+    single_codes <- codes[single_letters]
+    is_bad <- is.na(single_codes)
+    if (any(is_bad))
+        stop("bad letter(s): ", single_letters[is_bad])
+
+    # Unless 'OR == 0', letters of multi-character elements of
+    # 'letters' are to be tabulated in common.  We send a vector
+    # indicating the column (1-based) into which each letter
+    # of 'letters' should be tabulated.  For ex, for 'letters =
+    # c("CG", "AT")' and 'OR != 0', we send 'c(1,1,2,2)'.  The columns
+    # of the result are named accordingly using the OR symbol.
+    nc <- nchar(letters)
+    if (OR == 0 || max(nc) == 1) {
+        colmap <- NULL
+        colnames <- single_letters
+    } else {
+        colmap <- rep.int(seq_len(length(letters)), nc)
+        colnames <- sapply(strsplit(letters, NULL, fixed=TRUE),
+                           function(z) paste(z, collapse=OR))
+    }
+    ans <- .Call("XString_letterFrequencyInSlidingView",
+                 x, view.width, single_codes, colmap,
+                 PACKAGE="Biostrings")
+    colnames(ans) <- colnames
+    ans
+}
+
+setGeneric("letterFrequencyInSlidingView", signature="x",
+    function(x, view.width, letters, OR="|")
+        standardGeneric("letterFrequencyInSlidingView")
+)
+
+setMethod("letterFrequencyInSlidingView", "XString",
+    function(x, view.width, letters, OR="|")
+        .XString.code_frequency_in_sliding_view(x,
+                view.width, letters=letters, OR=OR)
+)
+
+#setMethod("letterFrequencyInSlidingView", "XStringSet",
+#    function(x, view.width, letters, OR="|")
+#        lapply(seq_len(length(x)),
+#               function(i)
+#                 letterFrequencyInSlidingView(x[[i]], view.width, letters, OR))
+#)
+
+#setMethod("letterFrequencyInSlidingView", "XStringViews",
+#    function(x, view.width, letters, OR="|")
+#    {
+#       y <- XStringViewsToSet(x, use.names=FALSE, verbose=FALSE)
+#       letterFrequencyInSlidingView(y, view.width, letters, OR)
+#    }
+#)
+
+#setMethod("letterFrequencyInSlidingView", "MaskedXString",
+#    function(x, view.width, letters, OR="|")
+#    {
+#        y <- as(x, "XStringViews")
+#        letterFrequencyInSlidingView(y, view.width, letters, OR)
+#    }
+#)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
