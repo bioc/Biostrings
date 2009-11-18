@@ -269,18 +269,20 @@ SEXP fasta_info(
 	SEXP use_descs
 );
 
-SEXP SharedRaw_loadFASTA(
-	SEXP rawptr_xp,
+SEXP read_fasta_in_XStringSet(
 	SEXP filepath,
-	SEXP collapse,
+	SEXP set_names,
+	SEXP elementType,
 	SEXP lkup
 );
 
 SEXP fastq_geometry(SEXP filepath);
 
-SEXP read_fastq(
+SEXP read_fastq_in_XStringSet(
 	SEXP filepath,
-	SEXP drop_quality
+	SEXP set_names,
+	SEXP elementType,
+	SEXP lkup
 );
 
 

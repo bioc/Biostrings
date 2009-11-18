@@ -1,11 +1,3 @@
-fasta.info <- function(file, use.descs=TRUE)
-{
-    if (!isSingleString(file))
-        stop("'file' must be a single string")
-    use.descs <- normargUseNames(use.descs)
-    .Call("fasta_info", file, use.descs, PACKAGE="Biostrings")
-}
-
 ### Robert's contribution
 readFASTA <- function(file, checkComments=TRUE, strip.descs=TRUE)
 {
