@@ -13,6 +13,8 @@
 \alias{tb.width}
 \alias{tb.width,PreprocessedTB-method}
 \alias{nnodes}
+\alias{hasAllFlinks}
+\alias{computeAllFlinks}
 \alias{initialize,PreprocessedTB-method}
 \alias{duplicated,PreprocessedTB-method}
 
@@ -24,22 +26,14 @@
 \alias{show,Twobit-method}
 \alias{initialize,Twobit-method}
 
-% ACtree class:
-\alias{class:ACtree}
-\alias{ACtree-class}
-\alias{ACtree}
-
-\alias{show,ACtree-method}
-\alias{[,ACtree-method}
-\alias{as.matrix,ACtree-method}
-\alias{initialize,ACtree-method}
-
 % ACtree2 class:
 \alias{class:ACtree2}
 \alias{ACtree2-class}
 \alias{ACtree2}
 
 \alias{nnodes,ACtree2-method}
+\alias{hasAllFlinks,ACtree2-method}
+\alias{computeAllFlinks,ACtree2-method}
 \alias{show,ACtree2-method}
 \alias{initialize,ACtree2-method}
 
@@ -129,7 +123,7 @@
     A single integer or \code{NA}. See the "Trusted Band" section below.
   }
   \item{algorithm}{
-    \code{"ACtree2"} (the default), \code{"ACtree"} or \code{"Twobit"}.
+    \code{"ACtree2"} (the default) or \code{"Twobit"}.
   }
   \item{skip.invalid.patterns}{
     This argument is not supported yet (and might in fact be replaced
@@ -149,7 +143,7 @@
   \code{tb.start=NA}, \code{tb.end=NA} and \code{tb.width=NA})
   the following limitations apply: (1) the original dictionary can only
   contain base letters (i.e. only As, Cs, Gs and Ts), therefore IUPAC
-  extended letters are not allowed; (2) all the
+  ambiguity codes are not allowed; (2) all the
   patterns in the dictionary must have the same length ("constant width"
   dictionary); and (3) later \code{matchPdict} can only be used with
   \code{max.mismatch=0}.
@@ -162,21 +156,22 @@
   number of mismatching letters, then see the "Allowing a small number
   of mismatching letters" section below.
 
-  Three preprocessing algorithms are currently supported:
-  \code{algorithm="ACtree2"} (the default), \code{algorithm="ACtree"} and
-  \code{algorithm="Twobit"}.
-  With the \code{"ACtree2"} and \code{"ACtree"} algorithms, all the
-  oligonucleotides in the Trusted Band are stored in a 4-ary Aho-Corasick
-  tree. With the \code{"Twobit"} algorithm, the 2-bit-per-letter
+  Two preprocessing algorithms are currently supported:
+  \code{algorithm="ACtree2"} (the default) and \code{algorithm="Twobit"}.
+  With the \code{"ACtree2"} algorithm, all the oligonucleotides in the
+  Trusted Band are stored in a 4-ary Aho-Corasick tree.
+  With the \code{"Twobit"} algorithm, the 2-bit-per-letter
   signatures of all the oligonucleotides in the Trusted Band are computed
   and the mapping from these signatures to the 1-based position of the
   corresponding oligonucleotide in the Trusted Band is stored in a way that
   allows very fast lookup.
-  Only with PDict objects obtained with the \code{"ACtree2"} or \code{"ACtree"}
-  algos can \code{matchPdict} then be called with \code{fixed="pattern"}
-  (instead of \code{fixed=TRUE}, the default) so that IUPAC extended letters
+  Only PDict objects preprocessed with the \code{"ACtree2"} algo can then
+  be used with \code{matchPdict} (and family) and with \code{fixed="pattern"}
+  (instead of \code{fixed=TRUE}, the default), so that IUPAC ambiguity codes
   in the subject are treated as ambiguities. PDict objects obtained with the
   \code{"Twobit"} algo don't allow this.
+  See \code{?`\link{matchPDict-inexact}`} for more information about support
+  of IUPAC ambiguity codes in the subject.
 }
 
 \section{Trusted Band}{
@@ -188,12 +183,12 @@
   Why use a Trusted Band?
 
   Because the limitations described above will apply to the Trusted Band only!
-  For example the Trusted Band cannot contain IUPAC extended letters but the
+  For example the Trusted Band cannot contain IUPAC ambiguity codes but the
   "head" and the "tail" can (see below for what those are).
   Also with a Trusted Band, if \code{matchPdict} is called with a non-null
   \code{max.mismatch} value then mismatching letters will be allowed in the
   head and the tail. Or, if \code{matchPdict} is called with
-  \code{fixed="subject"}, then IUPAC extended letters in the head and the
+  \code{fixed="subject"}, then IUPAC ambiguity codes in the head and the
   tail will be treated as ambiguities.
 
   How to specify a Trusted Band?
@@ -318,6 +313,7 @@
 \seealso{
   \code{\link{matchPDict}},
   \code{\link{DNA_ALPHABET}},
+  \code{\link{IUPAC_CODE_MAP}},
   \link{DNAStringSet-class},
   \link{XStringViews-class}
 }

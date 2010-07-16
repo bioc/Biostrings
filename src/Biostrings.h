@@ -925,6 +925,10 @@ SEXP debug_BitMatrix();
 
 SEXP debug_PreprocessedTB_class();
 
+SEXP _get_PreprocessedTB_tb(SEXP x);
+
+SEXP _get_PreprocessedTB_dups(SEXP x);
+
 SEXP _get_PreprocessedTB_base_codes(SEXP x);
 
 int _get_PreprocessedTB_length(SEXP x);
@@ -934,8 +938,6 @@ int _get_PreprocessedTB_width(SEXP x);
 SEXP _get_PreprocessedTB_low2high(SEXP x);
 
 SEXP _get_Twobit_sign2pos_tag(SEXP x);
-
-SEXP _get_ACtree_nodes_tag(SEXP x);
 
 SEXP _get_ACtree2_nodebuf_ptr(SEXP x);
 
@@ -1041,28 +1043,6 @@ void _match_Twobit(
 );
 
 
-/* match_pdict_ACtree.c */
-
-SEXP debug_match_pdict_ACtree();
-
-SEXP free_actree_nodes_buf();
-
-SEXP build_ACtree(
-	SEXP tb,
-	SEXP pp_exclude,
-	SEXP base_codes
-);
-
-SEXP ACtree_summary(SEXP pptb);
-
-void _match_ACtree(
-	SEXP pptb,
-	const cachedCharSeq *S,
-	int fixedS,
-	TBMatchBuf *tb_matches
-);
-
-
 /* BAB_class.c */
 
 SEXP debug_BAB_class();
@@ -1102,6 +1082,10 @@ SEXP ACtree2_build(
 	SEXP nodebuf_ptr,
 	SEXP nodeextbuf_ptr
 );
+
+SEXP ACtree2_has_all_flinks(SEXP pptb);
+
+SEXP ACtree2_compute_all_flinks(SEXP pptb);
 
 void _match_tbACtree2(
 	SEXP pptb,

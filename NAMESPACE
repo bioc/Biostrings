@@ -230,7 +230,7 @@ exportClasses(
     #SparseList,
     MIndex, ByPos_MIndex,
     BOC_SubjectString, BOC2_SubjectString,
-    PreprocessedTB, Twobit, ACtree, ACtree2,
+    PreprocessedTB, Twobit, ACtree2,
     PDict3Parts,
     PDict, TB_PDict, MTB_PDict, Expanded_TB_PDict
 )
@@ -278,7 +278,7 @@ export(
     palindromeRightArm, complementedPalindromeRightArm,
 
     ## PDict-class.R + matchPDict.R
-    tb, tb.width, nnodes,
+    tb, tb.width, nnodes, hasAllFlinks, computeAllFlinks,
     patternFrequency, PDict,
     matchPDict, countPDict, whichPDict,
     vmatchPDict, vcountPDict, vwhichPDict,
@@ -308,7 +308,7 @@ exportMethods(
     palindromeLeftArm, complementedPalindromeLeftArm,
     palindromeRightArm, complementedPalindromeRightArm,
 
-    tb, tb.width, nnodes,
+    tb, tb.width, nnodes, hasAllFlinks, computeAllFlinks,
     head, tail,
     patternFrequency, PDict,
     matchPDict, countPDict, whichPDict,
