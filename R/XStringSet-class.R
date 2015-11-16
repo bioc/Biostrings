@@ -124,7 +124,9 @@ setReplaceMethod("subseq", "character",
     function(x, start=NA, end=NA, width=NA, value)
     {
         bands <- threebands(x, start=start, end=end, width=width)
-        paste(bands$left, value, bands$right, sep="")
+        ## Use x[] <- ... to preserve names and any other attribute.
+        x[] <- paste(bands$left, value, bands$right, sep="")
+        x
     }
 )
 
@@ -134,10 +136,14 @@ setReplaceMethod("subseq", "XStringSet",
     function(x, start=NA, end=NA, width=NA, value)
     {
         bands <- threebands(x, start=start, end=end, width=width)
-        if (is.null(value))
-            xscat(bands$left, bands$right)
-        else
-            xscat(bands$left, value, bands$right)
+        ## Use x[] <- ... to preserve class (endomorphism), names, metadata
+        ## columns, and any other attribute.
+        if (is.null(value)) {
+            x[] <- xscat(bands$left, bands$right)
+        } else {
+            x[] <- xscat(bands$left, value, bands$right)
+        }
+        x
     }
 )
 
