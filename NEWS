@@ -1,3 +1,40 @@
+VERSION 2.74.0
+--------------
+
+NEW FEATURES
+
+    o Add ellipsis to arg list of matchProbePair() generic and methods.
+      Extra arguments passed thru the ellipsis are forwarded to the internal
+      calls to matchPattern().
+      [by Aidan Lakshman <ahl27@pitt.edu>]
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o Undeprecate longestConsecutive().
+
+    o A warning in translate() has been elevated to an error because
+      AA_ALPHABET is now enforced.
+      [by Aidan Lakshman <ahl27@pitt.edu>]
+
+    o man/XStringSetList-class.Rd previously said that "DNAStringSetList and
+      AAStringSetList are the only constructors", but the current version of
+      Biostrings includes BStringSetList and RNAStringSetList constructors.
+      This has been updated.
+      [by Aidan Lakshman <ahl27@pitt.edu>]
+
+BUG FIXES
+
+    o replaceAmbiguities() now checks to ensure input is DNA or RNA. This
+      previously caused some odd behavior with AA input.
+      [by Aidan Lakshman <ahl27@pitt.edu>]
+
+    o Fix bug in consensusMatrix() when input has length zero.
+      [by Aidan Lakshman <ahl27@pitt.edu>]
+
+    o Get rid of spurious warning in readQualityScaledDNAStringSet().
+      [by Aidan Lakshman <ahl27@pitt.edu>]
+
+
 VERSION 2.72.0
 --------------
 

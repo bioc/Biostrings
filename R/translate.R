@@ -16,7 +16,7 @@
     ## 07/26/2024: updated to error since AAString() enforces alphabet
     if (!all(genetic.code %in% AA_ALPHABET))
         stop("some codons in 'genetic.code' are mapped to letters ",
-                "not in the Amino Acid\n  alphabet (AA_ALPHABET)")
+             "not in the Amino Acid\n  alphabet (AA_ALPHABET)")
     alt_init_codons <- attr(genetic.code, "alt_init_codons", exact=TRUE)
     if (is.null(alt_init_codons)
      || !is.character(alt_init_codons)
