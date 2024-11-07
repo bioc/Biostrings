@@ -15,9 +15,10 @@
 {
     .load_package_gracefully("pwalign", "starting with BioC 3.19, ",
                              "calling ", fun, "()")
-    msg <- c(fun, "() has moved to the pwalign package. Please ",
-             "call pwalign::", fun, "() to get rid of this warning.")
-    warning(wmsg(msg))
+    msg <- c(fun, "() has moved from Biostrings to the pwalign package, ",
+             "and is formally deprecated in Biostrings >= 2.75.1. ",
+             "Please call pwalign::", fun, "() to get rid of this warning.")
+    .Deprecated(msg=wmsg(msg))
     FUN <- base::get(fun, envir=asNamespace("pwalign"), inherits=FALSE)
     do.call(FUN, list(...))
 }
