@@ -8,8 +8,6 @@
 % Accessor methods:
 \alias{subpatterns}
 \alias{subpatterns,XStringPartialMatches-method}
-\alias{pattern}
-\alias{pattern,XStringPartialMatches-method}
 
 % Standard generic methods:
 \alias{show,XStringPartialMatches-method}
@@ -18,10 +16,7 @@
 \title{XStringPartialMatches objects}
 
 \description{
-  WARNING: This class is currently under development and might
-  not work properly! Full documentation will come later.
-
-  Please DO NOT TRY TO USE it for now. Thanks for your comprehension!
+  WARNING: XStringPartialMatches objects are deprecated!
 }
 
 \section{Accessor methods}{

@@ -13,6 +13,7 @@
 \alias{indel}
 \alias{nindel}
 \alias{PairwiseAlignments}
+\alias{pattern}
 \alias{alignedPattern}
 \alias{alignedSubject}
 \alias{PairwiseAlignmentsSingleSubject}
@@ -42,6 +43,7 @@
       \item \code{indel}
       \item \code{nindel}
       \item \code{PairwiseAlignments}
+      \item \code{pattern}
       \item \code{alignedPattern}
       \item \code{alignedSubject}
       \item \code{PairwiseAlignmentsSingleSubject}

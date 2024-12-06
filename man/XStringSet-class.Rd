@@ -50,6 +50,7 @@
 \alias{as.matrix,XStringSet-method}
 
 \alias{updateObject,XStringSet-method}
+\alias{updateObject,AAStringSet-method}
 
 
 \title{XStringSet objects}

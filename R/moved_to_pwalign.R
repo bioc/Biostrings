@@ -56,6 +56,9 @@ nindel <-
 PairwiseAlignments <-
     function(...) .call_fun_in_pwalign("PairwiseAlignments", ...)
 
+pattern <-
+    function(...) .call_fun_in_pwalign("pattern", ...)
+
 alignedPattern <-
     function(...) .call_fun_in_pwalign("alignedPattern", ...)
 

@@ -15,11 +15,15 @@ setClass("XStringPartialMatches",
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Accessor methods
 
-setGeneric("subpatterns", function(x) standardGeneric("subpatterns"))
-setMethod("subpatterns", "XStringPartialMatches", function(x) x@subpatterns)
+setGeneric("subpatterns",
+    function(x)
+    {
+        .Deprecated()
+        standardGeneric("subpatterns")
+    }
+)
 
-setGeneric("pattern", function(x) standardGeneric("pattern"))
-setMethod("pattern", "XStringPartialMatches", function(x) x@subpatterns@subject)
+setMethod("subpatterns", "XStringPartialMatches", function(x) x@subpatterns)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -29,6 +33,8 @@ setMethod("pattern", "XStringPartialMatches", function(x) x@subpatterns@subject)
 setMethod("show", "XStringPartialMatches",
     function(object)
     {
+        msg <- "XStringPartialMatches objects are deprecated"
+        .Deprecated(msg=wmsg(msg))
         subject <- subject(object)
         lsub <- length(subject)
         cat("  Views on a ", lsub, "-letter ",
@@ -57,6 +63,8 @@ setMethod("show", "XStringPartialMatches",
 setMethod("[", "XStringPartialMatches",
     function(x, i, j, ..., drop)
     {
+        msg <- "XStringPartialMatches objects are deprecated"
+        .Deprecated(msg=wmsg(msg))
         ans <- callNextMethod()
         ans@subpatterns <- ans@subpatterns[i]
         ans

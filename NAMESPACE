@@ -310,7 +310,7 @@ exportClasses(
 
 export(
     ## XStringPartialMatches-class.R:
-    subpatterns, pattern,
+    subpatterns,
 
     ## XStringQuality-class.R:
     PhredQuality, SolexaQuality, IlluminaQuality,
@@ -350,7 +350,7 @@ exportMethods(
     show, summary,
     start, end, width,
     Views,
-    subpatterns, pattern,
+    subpatterns,
     quality, encoding,
     parallel_slot_names,
     parallelVectorNames,
@@ -391,7 +391,7 @@ export(
 
     insertion, deletion,
     unaligned, aligned, indel, nindel,
-    PairwiseAlignments, alignedPattern, alignedSubject,
+    PairwiseAlignments, pattern, alignedPattern, alignedSubject,
     PairwiseAlignmentsSingleSubject,
     nedit,
     mismatchTable, mismatchSummary,

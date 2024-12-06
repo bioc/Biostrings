@@ -54,6 +54,7 @@
 
 % "updateObject" method:
 \alias{updateObject,XString-method}
+\alias{updateObject,AAString-method}
 
 
 \title{BString objects}
