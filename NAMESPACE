@@ -398,6 +398,9 @@ export(
     compareStrings,
     pid,
     pairwiseAlignment,
-    stringDist
+    stringDist,
+    print.moved_to_pwalign_pkg
 )
+
+S3method(print, moved_to_pwalign_pkg)
 
